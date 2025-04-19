@@ -1,0 +1,389 @@
+{
+    "@context": {
+      "schema": "http://schema.org/",
+      "oe": "https://openevo.org/ontology#",
+      "skos": "http://www.w3.org/2004/02/skos/core#",
+      "Concept": "oe:Concept",
+      "name": "schema:name",
+      "definition": "schema:description",
+      "domains": "oe:domain",
+      "topics": "oe:exampleTopic",
+      "related": "skos:related",
+      "broader": "skos:broader",
+      "narrower": "skos:narrower",
+      "collection": "oe:conceptCollection"
+    },
+    "@graph": [
+  
+      {
+        "@type": "Concept",
+        "@id": "oe:Evolution",
+        "name": "Evolution",
+        "definition": "The process through which populations of living organisms change over generations through mechanisms such as natural selection and genetic drift.",
+        "domains": ["Biology", "Anthropology", "Psychology", "Sociology", "Computer Science"],
+        "topics": ["Evolution of cheetah speed", "Human evolution", "Cultural evolution"],
+        "related": ["oe:NaturalSelection", "oe:Adaptation"],
+        "collection": ["OpenEvo Core Concepts", "Evolutionary Concepts"]
+      },
+      {
+        "@type": "Concept",
+        "@id": "oe:NaturalSelection",
+        "name": "Natural Selection",
+        "definition": "A mechanism of evolution in which organisms better adapted to their environment tend to survive and produce more offspring.",
+        "domains": ["Biology"],
+        "topics": ["Darwin’s finches", "Camouflage in insects"],
+        "related": ["oe:Evolution", "oe:Variation"],
+        "collection": ["Evolutionary Concepts"]
+      },
+      {
+        "@type": "Concept",
+        "@id": "oe:Adaptation",
+        "name": "Adaptation",
+        "definition": "A characteristic that improves an individual's ability to survive and reproduce in a particular environment.",
+        "domains": ["Biology", "Education", "Psychology"],
+        "topics": ["Polar bear fur", "Student coping strategies"],
+        "related": ["oe:Evolution", "oe:Behavior"],
+        "collection": ["OpenEvo Core Concepts", "Human Experience Concepts", "Evolutionary Concepts"]
+      },
+      {
+        "@type": "Concept",
+        "@id": "oe:Agency",
+        "name": "Agency",
+        "definition": "The capacity of individuals or systems to act independently and make their own free choices.",
+        "domains": ["Psychology", "Education", "Sociology"],
+        "topics": ["Student agency in project-based learning", "AI agent design"],
+        "related": ["oe:Agent", "oe:Behavior", "oe:Goal"],
+        "collection": ["OpenEvo Core Concepts", "Behavioral Concepts"]
+      },
+  
+      {
+        "@type": "Concept",
+        "@id": "oe:System",
+        "name": "System",
+        "definition": "A set of interacting or interdependent components forming an integrated whole.",
+        "domains": ["Biology", "Engineering", "Sustainability", "Psychology"],
+        "topics": ["The digestive system", "Sustainable farming systems", "Cognitive systems"],
+        "related": ["oe:SystemModels", "oe:Sustainability"],
+        "collection": ["OpenEvo Core Concepts", "NGSS Crosscutting Concepts", "Sustainability Concepts"]
+      },
+      {
+        "@type": "Concept",
+        "@id": "oe:CauseEffect",
+        "name": "Cause and Effect",
+        "definition": "A relationship in which one event (the cause) makes another event happen (the effect).",
+        "domains": ["Science", "Engineering", "History", "Education"],
+        "topics": ["Climate change impacts", "Invention of the printing press"],
+        "collection": ["NGSS Crosscutting Concepts"]
+      },
+      {
+        "@type": "Concept",
+        "@id": "oe:Metacognition",
+        "name": "Metacognition",
+        "definition": "Awareness and understanding of one’s own thought processes.",
+        "domains": ["Psychology", "Education"],
+        "topics": ["Reflective journaling", "Thinking about thinking"],
+        "related": ["oe:Cognition", "oe:Learning"],
+        "collection": ["Metacognitive Concepts", "Advanced Concepts"]
+      },
+      {
+        "@type": "Concept",
+        "@id": "oe:Design",
+        "name": "Design",
+        "definition": "The intentional planning of form and function to solve a problem or fulfill a purpose.",
+        "domains": ["Engineering", "Education", "Social Innovation"],
+        "topics": ["Bridge construction", "Curriculum design"],
+        "collection": ["OpenEvo Core Concepts", "Design Thinking Concepts"]
+      },
+      {
+        "@type": "Concept",
+        "@id": "oe:Cognition",
+        "name": "Cognition",
+        "definition": "The mental processes involved in gaining knowledge and comprehension.",
+        "domains": ["Psychology", "Neuroscience", "AI"],
+        "topics": ["Memory", "Decision-making"],
+        "collection": ["OpenEvo Core Concepts", "Metacognitive Concepts"]
+      },
+      {
+        "@type": "Concept",
+        "@id": "oe:Culture",
+        "name": "Culture",
+        "definition": "The shared behaviors, beliefs, and symbols of a group passed down through learning.",
+        "domains": ["Anthropology", "Sociology", "Education"],
+        "topics": ["Cultural norms", "Ethnography"],
+        "related": ["oe:Behavior", "oe:Information"],
+        "collection": ["OpenEvo Core Concepts", "Human Experience Concepts", "Behavioral Concepts"]
+      },
+      {
+        "@type": "Concept",
+        "@id": "oe:Truth",
+        "name": "Truth",
+        "definition": "That which is in accordance with fact or reality; a central concern in epistemology and education.",
+        "domains": ["Philosophy", "Theory of Knowledge"],
+        "topics": ["Scientific truth", "Social truth"],
+        "related": ["oe:Evidence", "oe:Justification"],
+        "collection": ["TOK Concepts"]
+      },
+      {
+        "@type": "Concept",
+        "@id": "oe:Sustainability",
+        "name": "Sustainability",
+        "definition": "Meeting the needs of the present without compromising the ability of future generations to meet their own needs.",
+        "domains": ["Ecology", "Economics", "Design"],
+        "topics": ["Renewable energy", "Permaculture"],
+        "related": ["oe:System", "oe:Regeneration"],
+        "collection": ["OpenEvo Core Concepts", "Sustainability Concepts"]
+      },
+      {
+        "@type": "Concept",
+        "@id": "oe:Power",
+        "name": "Power",
+        "definition": "The ability or capacity to do something or act in a particular way; often refers to the ability to influence others or control resources.",
+        "domains": ["Sociology", "Politics", "Education", "Physics"],
+        "topics": ["Political systems", "Social influence", "Electrical power"],
+        "related": ["oe:Agency", "oe:Structure", "oe:Equity"],
+        "collection": ["TOK Concepts", "Human Experience Concepts"]
+      },
+      {
+        "@type": "Concept",
+        "@id": "oe:Perspective",
+        "name": "Perspective",
+        "definition": "A particular attitude or way of viewing something; influenced by context, experience, and background.",
+        "domains": ["Art", "Sociology", "History", "Psychology"],
+        "topics": ["Point of view in narratives", "Cultural relativism"],
+        "related": ["oe:Culture", "oe:Interpretation", "oe:Context"],
+        "collection": ["TOK Concepts", "Human Experience Concepts"]
+      },
+      {
+        "@type": "Concept",
+        "@id": "oe:Analogy",
+        "name": "Analogy",
+        "definition": "A comparison between two things, typically for the purpose of explanation or clarification.",
+        "domains": ["Education", "Science", "Linguistics"],
+        "topics": ["Solar system as an atom", "Computer memory vs human memory"],
+        "related": ["oe:Metaphor", "oe:Model"],
+        "collection": ["OpenEvo Core Concepts", "Design Thinking Concepts"]
+      },
+      {
+        "@type": "Concept",
+        "@id": "oe:Model",
+        "name": "Model",
+        "definition": "A simplified representation of a system or phenomenon, used to explain, predict, or analyze its behavior.",
+        "domains": ["Science", "Engineering", "Education"],
+        "topics": ["Water cycle model", "Economic models", "Simulation of ecosystems"],
+        "related": ["oe:System", "oe:Analogy", "oe:Prediction"],
+        "collection": ["NGSS Crosscutting Concepts", "OpenEvo Core Concepts"]
+      },
+      {
+        "@type": "Concept",
+        "@id": "oe:Information",
+        "name": "Information",
+        "definition": "Data that has been processed or structured to be meaningful; fundamental to communication, learning, and decision-making.",
+        "domains": ["Computer Science", "Biology", "Communication"],
+        "topics": ["DNA as genetic information", "News media", "Internet communication"],
+        "related": ["oe:Communication", "oe:Culture", "oe:Learning"],
+        "collection": ["OpenEvo Core Concepts", "Human Experience Concepts"]
+      },
+      {
+        "@type": "Concept",
+        "@id": "oe:Random",
+        "name": "Randomness",
+        "definition": "The quality or state of lacking a pattern or predictability; essential in probability, genetics, and complex systems.",
+        "domains": ["Mathematics", "Physics", "Biology"],
+        "topics": ["Genetic mutation", "Randomized experiments", "Coin toss"],
+        "related": ["oe:Probability", "oe:Variation"],
+        "collection": ["OpenEvo Core Concepts", "Scientific Thinking Concepts"]
+      },
+      {
+        "@type": "Concept",
+        "@id": "oe:Complexity",
+        "name": "Complexity",
+        "definition": "The state of having many parts and being difficult to understand or predict; common in natural and social systems.",
+        "domains": ["Systems Science", "Biology", "Economics"],
+        "topics": ["Ecosystems", "Human brain", "Markets"],
+        "related": ["oe:System", "oe:Emergence"],
+        "collection": ["NGSS Crosscutting Concepts", "Sustainability Concepts"]
+      },
+      {
+        "@type": "Concept",
+        "@id": "oe:Emergence",
+        "name": "Emergence",
+        "definition": "The process by which larger entities arise through interactions among smaller or simpler entities that themselves do not exhibit such properties.",
+        "domains": ["Complex Systems", "Biology", "Cognitive Science"],
+        "topics": ["Ant colony behavior", "Consciousness", "Traffic patterns"],
+        "related": ["oe:Complexity", "oe:Behavior"],
+        "collection": ["Scientific Thinking Concepts", "Behavioral Concepts"]
+      },
+      {
+        "@type": "Concept",
+        "@id": "oe:Scale",
+        "name": "Scale",
+        "definition": "The relative size or extent of something, often used to analyze systems at different levels of detail or organization.",
+        "domains": ["Geography", "Science", "Design"],
+        "topics": ["Cell vs organism", "Global vs local economies"],
+        "related": ["oe:System", "oe:Pattern"],
+        "collection": ["NGSS Crosscutting Concepts"]
+      },
+      {
+        "@type": "Concept",
+        "@id": "oe:Pattern",
+        "name": "Pattern",
+        "definition": "A regularity or repeated form, sequence, or arrangement that can be observed and analyzed.",
+        "domains": ["Mathematics", "Art", "Science"],
+        "topics": ["Seasons", "Tessellations", "Growth patterns in plants"],
+        "related": ["oe:Prediction", "oe:Model"],
+        "collection": ["NGSS Crosscutting Concepts"]
+      },
+      {
+        "@type": "Concept",
+        "@id": "oe:Justification",
+        "name": "Justification",
+        "definition": "The process of providing reasons or evidence to support a belief, claim, or action.",
+        "domains": ["Epistemology", "Science", "Ethics"],
+        "topics": ["Scientific reasoning", "Moral decision-making"],
+        "related": ["oe:Evidence", "oe:Truth"],
+        "collection": ["TOK Concepts", "Scientific Thinking Concepts"]
+      },
+      {
+        "@type": "Concept",
+        "@id": "oe:Evidence",
+        "name": "Evidence",
+        "definition": "Facts or observations that support or refute a hypothesis, theory, or belief.",
+        "domains": ["Science", "Law", "Education"],
+        "topics": ["Fossil records", "Experimental data", "Historical documents"],
+        "related": ["oe:Truth", "oe:Justification"],
+        "collection": ["OpenEvo Core Concepts", "Scientific Thinking Concepts"]
+      },
+      {
+        "@type": "Concept",
+        "@id": "oe:Agency",
+        "name": "Agency",
+        "definition": "The capacity of individuals or groups to act independently and make choices that influence events.",
+        "domains": ["Sociology", "Psychology", "Education"],
+        "topics": ["Student agency", "Political activism", "Free will"],
+        "related": ["oe:Structure", "oe:Responsibility"],
+        "collection": ["Human Experience Concepts"]
+      },
+      {
+        "@type": "Concept",
+        "@id": "oe:Structure",
+        "name": "Structure",
+        "definition": "Stable patterns, systems, or frameworks that organize or constrain behaviors and relationships.",
+        "domains": ["Sociology", "Architecture", "Biology"],
+        "topics": ["Social institutions", "Cell structures", "Narrative structure"],
+        "related": ["oe:Agency", "oe:System"],
+        "collection": ["Human Experience Concepts"]
+      },
+      {
+        "@type": "Concept",
+        "@id": "oe:Context",
+        "name": "Context",
+        "definition": "The circumstances or background relevant to an event, idea, or statement, which help explain its meaning.",
+        "domains": ["History", "Literature", "Sociology"],
+        "topics": ["Historical context", "Cultural context", "Scientific discovery"],
+        "related": ["oe:Perspective", "oe:Interpretation"],
+        "collection": ["Human Experience Concepts"]
+      },
+      {
+        "@type": "Concept",
+        "@id": "oe:Interpretation",
+        "name": "Interpretation",
+        "definition": "The act of explaining or understanding the meaning of something.",
+        "domains": ["Literature", "History", "Art"],
+        "topics": ["Poetry analysis", "Legal interpretation", "Body language"],
+        "related": ["oe:Context", "oe:Perspective"],
+        "collection": ["TOK Concepts", "Human Experience Concepts"]
+      },
+      {
+        "@type": "Concept",
+        "@id": "oe:Bias",
+        "name": "Bias",
+        "definition": "A tendency to lean in a certain direction, often leading to unfair treatment or interpretation.",
+        "domains": ["Psychology", "Sociology", "Statistics"],
+        "topics": ["Confirmation bias", "Implicit bias", "Sampling bias"],
+        "related": ["oe:Perspective", "oe:Justification"],
+        "collection": ["TOK Concepts"]
+      },
+      {
+        "@type": "Concept",
+        "@id": "oe:Uncertainty",
+        "name": "Uncertainty",
+        "definition": "The state of being uncertain or not fully known, which influences decision-making and knowledge claims.",
+        "domains": ["Science", "Mathematics", "Philosophy"],
+        "topics": ["Scientific predictions", "Probability", "Quantum mechanics"],
+        "related": ["oe:Evidence", "oe:Bias"],
+        "collection": ["TOK Concepts", "Scientific Thinking Concepts"]
+      },
+      {
+        "@type": "Concept",
+        "@id": "oe:Knowledge",
+        "name": "Knowledge",
+        "definition": "Justified true belief or information gained through experience, reasoning, or education.",
+        "domains": ["Philosophy", "Epistemology", "Education"],
+        "topics": ["Types of knowledge", "Personal knowledge", "Shared knowledge"],
+        "related": ["oe:Justification", "oe:Truth", "oe:Evidence"],
+        "collection": ["TOK Concepts"]
+      },
+      {
+        "@type": "Concept",
+        "@id": "oe:Truth",
+        "name": "Truth",
+        "definition": "A property of statements that accurately reflect reality or fact.",
+        "domains": ["Philosophy", "Science", "Journalism"],
+        "topics": ["Objective truth", "Correspondence theory", "Fact-checking"],
+        "related": ["oe:Evidence", "oe:Justification"],
+        "collection": ["TOK Concepts"]
+      },
+      {
+        "@type": "Concept",
+        "@id": "oe:Responsibility",
+        "name": "Responsibility",
+        "definition": "A moral or legal obligation to act correctly or make ethical choices.",
+        "domains": ["Ethics", "Civics", "Education"],
+        "topics": ["Civic duty", "Environmental responsibility", "Academic integrity"],
+        "related": ["oe:Agency", "oe:Power"],
+        "collection": ["Human Experience Concepts"]
+      },
+      {
+        "@type": "Concept",
+        "@id": "oe:Culture",
+        "name": "Culture",
+        "definition": "The beliefs, practices, arts, and social institutions of a particular group or society.",
+        "domains": ["Anthropology", "Sociology", "Education"],
+        "topics": ["Cultural values", "Traditions", "Symbols and language"],
+        "related": ["oe:Perspective", "oe:Context"],
+        "collection": ["OpenEvo Core Concepts", "Human Experience Concepts"]
+      },
+      {
+        "@type": "Concept",
+        "@id": "oe:Equity",
+        "name": "Equity",
+        "definition": "The quality of being fair and impartial; involves recognizing different needs and circumstances.",
+        "domains": ["Education", "Economics", "Social justice"],
+        "topics": ["Inclusive policies", "Access to education", "Health equity"],
+        "related": ["oe:Power", "oe:Justice"],
+        "collection": ["Human Experience Concepts"]
+      },
+      {
+        "@type": "Concept",
+        "@id": "oe:Justice",
+        "name": "Justice",
+        "definition": "The principle of moral rightness and fairness in the treatment of individuals and distribution of resources.",
+        "domains": ["Law", "Philosophy", "Politics"],
+        "topics": ["Distributive justice", "Criminal justice", "Social justice"],
+        "related": ["oe:Equity", "oe:Responsibility"],
+        "collection": ["Human Experience Concepts"]
+      },
+      {
+        "@type": "Concept",
+        "@id": "oe:Identity",
+        "name": "Identity",
+        "definition": "The qualities, beliefs, and expressions that make a person or group unique.",
+        "domains": ["Psychology", "Sociology", "Anthropology"],
+        "topics": ["Gender identity", "Cultural identity", "Personal development"],
+        "related": ["oe:Culture", "oe:Perspective"],
+        "collection": ["Human Experience Concepts"]
+      }
+  
+    ]
+  }
+  
