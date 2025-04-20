@@ -1,0 +1,540 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Concept Library - OpenEvo Concept Studio</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            padding: 1.5rem;
+            background: #f3f4f6;
+        }
+        #concept-graph-container {
+            min-height: 500px;
+            min-width: 300px;
+            width: 100%;
+            height: 100%;
+            position: relative;
+        }
+        #concept-graph {
+            display: block;
+            width: 100%;
+            height: 100%;
+        }
+        .links line {
+            stroke: #a1a1aa;
+            stroke-opacity: 0.5;
+            stroke-width: 1px;
+        }
+        .nodes circle {
+            stroke: #ffffff;
+            stroke-width: 1.5px;
+            cursor: grab;
+        }
+        .nodes circle:active {
+            cursor: grabbing;
+        }
+        .nodes text {
+            font-size: 9px;
+            font-family: sans-serif;
+            pointer-events: none;
+            text-anchor: middle;
+            dominant-baseline: hanging;
+            fill: #374151;
+            paint-order: stroke;
+            stroke: #ffffff;
+            stroke-width: 2px;
+            stroke-linecap: butt;
+            stroke-linejoin: miter;
+        }
+        #tooltip {
+            position: absolute;
+            text-align: left;
+            width: auto;
+            max-width: 250px;
+            height: auto;
+            padding: 8px;
+            font: 11px sans-serif;
+            background: rgba(55, 65, 81, 0.9);
+            color: white;
+            border: 0px;
+            border-radius: 4px;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.2s;
+            z-index: 1000;
+        }
+        #tooltip strong {
+            display: block;
+            margin-bottom: 4px;
+            font-weight: 600;
+        }
+        #library-message {
+            text-align: center;
+            padding: 20px;
+            color: #6b7280;
+        }
+        .spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #3498db;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-right: 8px;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <h1 class="text-2xl font-semibold text-gray-800 mb-6">Concept Library</h1>
+    <p class="text-gray-600 mb-4">Explore concepts, select collections, and visualize their connections.</p>
+    <div id="library-message" class="hidden bg-yellow-50 text-yellow-700 p-4 rounded-md mb-4 flex items-center justify-center">
+        <span class="spinner"></span>Loading concept data...
+    </div>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div class="md:col-span-1 bg-white p-4 rounded-lg shadow">
+            <h3 class="text-lg font-semibold mb-3 border-b pb-2">Select Collections</h3>
+            <div id="collection-list" class="space-y-2 max-h-80 overflow-y-auto mb-4"></div>
+            <button id="update-graph-btn" class="w-full px-4 py-2 bg-indigo-600 text-white font-semibold rounded-lg shadow hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 disabled:opacity-50" disabled>
+                Update Visualization
+            </button>
+            <div id="suggested-collections" class="mt-4">
+                <h4 class="text-md font-semibold mb-2 text-gray-700">Suggested Collections:</h4>
+                <div id="suggestions-list" class="text-sm text-gray-600 space-y-1">
+                    <p class="text-xs italic">Select collections to see suggestions.</p>
+                </div>
+            </div>
+        </div>
+        <div class="md:col-span-2 bg-white p-4 rounded-lg shadow min-h-[500px] flex flex-col">
+            <h3 class="text-lg font-semibold mb-3 border-b pb-2">Concept Connections</h3>
+            <div id="concept-graph-container" class="flex-grow relative">
+                <svg id="concept-graph" class="w-full h-full"></svg>
+                <div id="tooltip"></div>
+                <p id="graph-placeholder" class="absolute inset-0 flex items-center justify-center text-gray-400">Select collections and click "Update Visualization" to see the graph.</p>
+            </div>
+        </div>
+    </div>
+    <script>
+        // --- Constants ---
+        const GITHUB_DATA_URL = 'https://raw.githubusercontent.com/dustineirdosh/concept-studio/main/higher_concepts_GPT.json';
+        const MULTI_COLLECTION_COLOR = "#a855f7";
+
+        // --- Global Variables ---
+        let fullConceptData = { "@graph": [] };
+        let allCollections = [];
+        let simulation = null;
+        let colorScale = d3.scaleOrdinal(d3.schemePaired);
+
+        // --- DOM Elements ---
+        const collectionListDiv = document.getElementById('collection-list');
+        const updateGraphBtn = document.getElementById('update-graph-btn');
+        const graphSvg = d3.select("#concept-graph");
+        const graphContainer = document.getElementById('concept-graph-container');
+        const graphPlaceholder = document.getElementById('graph-placeholder');
+        const suggestionsListDiv = document.getElementById('suggestions-list');
+        const tooltip = d3.select("#tooltip");
+        const libraryMessageDiv = document.getElementById('library-message');
+
+        // --- Concept Library Logic ---
+
+        /** Fetches data and initializes the Concept Library view. */
+        async function initializeLibraryView() {
+            showLibraryMessage("Loading concept data...", false);
+            updateGraphBtn.disabled = true;
+
+            try {
+                const response = await fetch(GITHUB_DATA_URL);
+                if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+                fullConceptData = await response.json();
+                if (!fullConceptData || !fullConceptData["@graph"]) throw new Error("Invalid data structure received.");
+
+                console.log(`Fetched ${fullConceptData["@graph"].length} concepts.`);
+            } catch (error) {
+                console.error("Error fetching concept data:", error);
+                console.warn("Falling back to mock data due to fetch failure.");
+                fullConceptData = {
+                    "@graph": [
+                        {
+                            "@id": "c1",
+                            "name": "Concept 1",
+                            "definition": "Test concept 1",
+                            "collection": ["Biology"],
+                            "related": ["c2"]
+                        },
+                        {
+                            "@id": "c2",
+                            "name": "Concept 2",
+                            "definition": "Test concept 2",
+                            "collection": ["Biology"],
+                            "related": ["c1"]
+                        }
+                    ]
+                };
+                showLibraryMessage("Using mock data due to network error.", true);
+            }
+
+            // Normalize collection fields
+            fullConceptData["@graph"].forEach(concept => {
+                concept.collection = Array.isArray(concept.collection) 
+                    ? concept.collection 
+                    : (concept.collection ? [concept.collection] : []);
+            });
+
+            const collections = new Set();
+            fullConceptData["@graph"].forEach(concept => {
+                concept.collection.forEach(col => collections.add(col));
+            });
+            allCollections = Array.from(collections).sort();
+
+            populateCollectionCheckboxes();
+
+            if (updateGraphBtn) {
+                updateGraphBtn.addEventListener('click', updateVisualization);
+                updateGraphBtn.disabled = false;
+            }
+            hideLibraryMessage();
+        }
+
+        /** Populates the checkbox list for collections. */
+        function populateCollectionCheckboxes() {
+            collectionListDiv.innerHTML = '';
+            // Add "Select All" and "Deselect All"
+            const controlsDiv = document.createElement('div');
+            controlsDiv.classList.add('flex', 'items-center', 'mb-2', 'border-b', 'pb-2', 'space-x-2');
+            const selectAllCheckbox = document.createElement('input');
+            selectAllCheckbox.type = 'checkbox';
+            selectAllCheckbox.id = 'select-all-collections';
+            selectAllCheckbox.classList.add('h-4', 'w-4', 'text-indigo-600', 'border-gray-300', 'rounded', 'focus:ring-indigo-500', 'cursor-pointer');
+            const selectAllLabel = document.createElement('label');
+            selectAllLabel.htmlFor = 'select-all-collections';
+            selectAllLabel.textContent = 'Select All';
+            selectAllLabel.classList.add('ml-2', 'block', 'text-sm', 'text-gray-700', 'cursor-pointer', 'font-medium');
+            const deselectAllButton = document.createElement('button');
+            deselectAllButton.textContent = 'Deselect All';
+            deselectAllButton.classList.add('px-2', 'py-1', 'bg-gray-200', 'text-gray-700', 'text-sm', 'rounded', 'hover:bg-gray-300', 'focus:outline-none');
+            controlsDiv.appendChild(selectAllCheckbox);
+            controlsDiv.appendChild(selectAllLabel);
+            controlsDiv.appendChild(deselectAllButton);
+            collectionListDiv.appendChild(controlsDiv);
+
+            // Add individual collection checkboxes
+            allCollections.forEach(col => {
+                const div = document.createElement('div');
+                div.classList.add('flex', 'items-center');
+                const checkbox = document.createElement('input');
+                checkbox.type = 'checkbox';
+                checkbox.id = `col-${col.replace(/\s+/g, '-')}`;
+                checkbox.value = col;
+                checkbox.classList.add('h-4', 'w-4', 'text-indigo-600', 'border-gray-300', 'rounded', 'focus:ring-indigo-500', 'cursor-pointer');
+                const label = document.createElement('label');
+                label.htmlFor = checkbox.id;
+                label.textContent = col;
+                label.classList.add('ml-2', 'block', 'text-sm', 'text-gray-700', 'cursor-pointer');
+                div.appendChild(checkbox);
+                div.appendChild(label);
+                collectionListDiv.appendChild(div);
+            });
+
+            // Event listener for "Select All"
+            selectAllCheckbox.addEventListener('change', () => {
+                const checkboxes = collectionListDiv.querySelectorAll('input[type="checkbox"]:not(#select-all-collections)');
+                checkboxes.forEach(cb => cb.checked = selectAllCheckbox.checked);
+                updateVisualization();
+            });
+
+            // Event listener for "Deselect All"
+            deselectAllButton.addEventListener('click', () => {
+                const checkboxes = collectionListDiv.querySelectorAll('input[type="checkbox"]');
+                checkboxes.forEach(cb => cb.checked = false);
+                updateVisualization();
+            });
+
+            // Update "Select All" state when individual checkboxes change
+            const checkboxes = collectionListDiv.querySelectorAll('input[type="checkbox"]:not(#select-all-collections)');
+            checkboxes.forEach(cb => {
+                cb.addEventListener('change', () => {
+                    const allChecked = Array.from(checkboxes).every(cb => cb.checked);
+                    selectAllCheckbox.checked = allChecked;
+                });
+            });
+        }
+
+        /** Shows a message in the library tab */
+        function showLibraryMessage(message, isError = false) {
+            libraryMessageDiv.innerHTML = isError 
+                ? message 
+                : `<span class="spinner"></span>${message}`;
+            libraryMessageDiv.classList.remove('hidden', 'bg-yellow-50', 'text-yellow-700', 'bg-red-50', 'text-red-700');
+            if (isError) {
+                libraryMessageDiv.classList.add('bg-red-50', 'text-red-700');
+            } else {
+                libraryMessageDiv.classList.add('bg-yellow-50', 'text-yellow-700');
+            }
+        }
+
+        /** Hides the library message area. */
+        function hideLibraryMessage() {
+            libraryMessageDiv.classList.add('hidden');
+        }
+
+        /** Updates the D3 visualization based on selected collections. */
+        function updateVisualization() {
+            const selectedCollections = Array.from(collectionListDiv.querySelectorAll('input[type="checkbox"]:not(#select-all-collections):checked'))
+                .map(cb => cb.value);
+
+            console.log("Selected collections:", selectedCollections);
+
+            if (selectedCollections.length === 0) {
+                clearVisualization();
+                graphPlaceholder.textContent = "Please select at least one collection to visualize.";
+                graphPlaceholder.style.display = 'flex';
+                updateSuggestions([], selectedCollections);
+                return;
+            }
+
+            graphPlaceholder.style.display = 'none';
+
+            // Filter concepts
+            const selectedConcepts = fullConceptData["@graph"].filter(concept =>
+                concept.collection && concept.collection.some(col => selectedCollections.includes(col))
+            );
+            const selectedConceptIds = new Set(selectedConcepts.map(c => c['@id'].trim()));
+
+            console.log(`Filtered ${selectedConcepts.length} concepts`);
+
+            if (selectedConcepts.length === 0) {
+                graphPlaceholder.textContent = "No concepts match the selected collections.";
+                graphPlaceholder.style.display = 'flex';
+                updateSuggestions([], selectedCollections);
+                return;
+            }
+
+            // Prepare D3 data
+            const nodes = selectedConcepts.map(c => {
+                const relevantCollections = c.collection.filter(col => selectedCollections.includes(col));
+                let nodeColor = MULTI_COLLECTION_COLOR;
+                if (relevantCollections.length === 1) {
+                    nodeColor = colorScale(relevantCollections[0]);
+                } else if (relevantCollections.length === 0) {
+                    nodeColor = '#9ca3af';
+                }
+                return {
+                    id: c['@id'].trim(),
+                    name: c.name || "Unnamed Concept",
+                    definition: c.definition || "No definition available.",
+                    collections: c.collection || [],
+                    color: nodeColor
+                };
+            });
+
+            const links = [];
+            selectedConcepts.forEach(concept => {
+                const sourceId = concept['@id'].trim();
+                const relatedConcepts = Array.isArray(concept.related) ? concept.related : (concept.related ? [concept.related] : []);
+                relatedConcepts.forEach(relatedId => {
+                    if (typeof relatedId === 'string' && selectedConceptIds.has(relatedId.trim())) {
+                        links.push({ source: sourceId, target: relatedId.trim(), type: 'related' });
+                    }
+                });
+            });
+
+            console.log("Nodes:", JSON.stringify(nodes, null, 2));
+            console.log("Links:", JSON.stringify(links, null, 2));
+
+            // Update suggestions
+            updateSuggestions(selectedConcepts, selectedCollections);
+
+            // Draw graph
+            drawGraph(nodes, links);
+        }
+
+        /** Updates the suggested collections list. */
+        function updateSuggestions(selectedConcepts, selectedCollections) {
+            const suggestedCollections = new Set();
+            selectedConcepts.forEach(concept => {
+                const collections = Array.isArray(concept.collection) 
+                    ? concept.collection 
+                    : (concept.collection ? [concept.collection] : []);
+                collections.forEach(col => {
+                    if (!selectedCollections.includes(col)) {
+                        suggestedCollections.add(col);
+                    }
+                });
+            });
+
+            suggestionsListDiv.innerHTML = '';
+            if (suggestedCollections.size > 0) {
+                suggestionsListDiv.innerHTML = '<p class="text-xs font-medium mb-1">Consider adding:</p>';
+                Array.from(suggestedCollections).sort().forEach(col => {
+                    const p = document.createElement('p');
+                    p.textContent = `• ${col}`;
+                    suggestionsListDiv.appendChild(p);
+                });
+            } else if (selectedCollections.length > 0) {
+                suggestionsListDiv.innerHTML = '<p class="text-xs italic">No additional related collections found.</p>';
+            } else {
+                suggestionsListDiv.innerHTML = '<p class="text-xs italic">Select collections to see suggestions.</p>';
+            }
+        }
+
+        /** Clears the D3 graph area. */
+        function clearVisualization() {
+            if (simulation) {
+                simulation.stop();
+            }
+            graphSvg.selectAll("*").remove();
+            graphPlaceholder.style.display = 'flex';
+            graphPlaceholder.textContent = "Select collections and click \"Update Visualization\" to see the graph.";
+        }
+
+        /** Draws the force-directed graph using D3. */
+        function drawGraph(nodes, links) {
+            clearVisualization();
+            graphPlaceholder.style.display = 'none';
+
+            const containerRect = graphContainer.getBoundingClientRect();
+            let width = containerRect.width;
+            let height = containerRect.height;
+
+            console.log(`Graph container: width=${width}, height=${height}`);
+
+            if (width <= 0 || height <= 0 || !nodes || nodes.length === 0) {
+                console.error("Invalid container dimensions or no nodes:", { width, height, nodes });
+                graphPlaceholder.textContent = "Cannot draw graph: Invalid container or no data.";
+                graphPlaceholder.style.display = 'flex';
+                return;
+            }
+
+            console.log(`Drawing graph: ${nodes.length} nodes, ${links.length} links`);
+
+            graphSvg.attr("viewBox", [0, 0, width, height]);
+
+            // Create a group for zoomable content
+            const g = graphSvg.append("g");
+
+            // Add zoom behavior
+            const zoom = d3.zoom()
+                .scaleExtent([0.5, 3])
+                .on("zoom", (event) => {
+                    g.attr("transform", event.transform);
+                });
+            graphSvg.call(zoom);
+
+            simulation = d3.forceSimulation(nodes)
+                .force("link", d3.forceLink(links).id(d => d.id).distance(50).strength(0.2))
+                .force("charge", d3.forceManyBody().strength(-50))
+                .force("center", d3.forceCenter(width / 2, height / 2).strength(0.2))
+                .force("collide", d3.forceCollide().radius(15).strength(0.8));
+
+            const link = g.append("g")
+                .attr("class", "links")
+                .selectAll("line")
+                .data(links)
+                .join("line")
+                .attr("stroke", "#a1a1aa")
+                .attr("stroke-opacity", 0.5)
+                .attr("stroke-width", 1);
+
+            const nodeGroup = g.append("g")
+                .attr("class", "nodes")
+                .selectAll("g")
+                .data(nodes, d => d.id)
+                .join("g")
+                .call(drag(simulation));
+
+            nodeGroup.append("circle")
+                .attr("r", 7)
+                .attr("fill", d => d.color)
+                .attr("stroke", "#ffffff")
+                .attr("stroke-width", 1.5);
+
+            nodeGroup.append("text")
+                .text(d => d.name)
+                .attr("y", 12)
+                .attr("font-size", "9px")
+                .attr("text-anchor", "middle")
+                .attr("dominant-baseline", "hanging")
+                .attr("fill", "#374151")
+                .attr("paint-order", "stroke")
+                .attr("stroke", "#ffffff")
+                .attr("stroke-width", "2px");
+
+            nodeGroup.on("mouseover", (event, d) => {
+                tooltip.transition().duration(200).style("opacity", 1);
+                tooltip.html(`<strong>${d.name}</strong>${d.definition}`)
+                    .style("left", (event.pageX + 10) + "px")
+                    .style("top", (event.pageY + 10) + "px");
+            })
+            .on("mouseout", () => {
+                tooltip.transition().duration(300).style("opacity", 0);
+            });
+
+            simulation.on("tick", () => {
+                link
+                    .attr("x1", d => Math.max(0, Math.min(width, d.source.x)))
+                    .attr("y1", d => Math.max(0, Math.min(height, d.source.y)))
+                    .attr("x2", d => Math.max(0, Math.min(width, d.target.x)))
+                    .attr("y2", d => Math.max(0, Math.min(height, d.target.y)));
+
+                nodeGroup
+                    .attr("transform", d => {
+                        const x = Math.max(10, Math.min(width - 10, d.x));
+                        const y = Math.max(10, Math.min(height - 10, d.y));
+                        return `translate(${x},${y})`;
+                    });
+            });
+
+            console.log("SVG elements created:", graphSvg.node().innerHTML);
+
+            // Handle window resize
+            window.addEventListener('resize', () => {
+                const newRect = graphContainer.getBoundingClientRect();
+                width = newRect.width;
+                height = newRect.height;
+                if (width > 0 && height > 0) {
+                    graphSvg.attr("viewBox", [0, 0, width, height]);
+                    simulation.force("center", d3.forceCenter(width / 2, height / 2).strength(0.2));
+                    simulation.alpha(0.1).restart();
+                }
+            });
+        }
+
+        /** Drag functionality */
+        function drag(simulation) {
+            function dragstarted(event, d) {
+                if (!event.active) simulation.alphaTarget(0.3).restart();
+                d.fx = d.x;
+                d.fy = d.y;
+            }
+            function dragged(event, d) {
+                d.fx = event.x;
+                d.fy = event.y;
+            }
+            function dragended(event, d) {
+                if (!event.active) simulation.alphaTarget(0);
+                d.fx = null;
+                d.fy = null;
+            }
+            return d3.drag()
+                .on("start", dragstarted)
+                .on("drag", dragged)
+                .on("end", dragended);
+        }
+
+        // Initialize on load
+        document.addEventListener('DOMContentLoaded', initializeLibraryView);
+    </script>
+</body>
+</html>

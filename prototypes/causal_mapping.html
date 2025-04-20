@@ -1,0 +1,1035 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Causal Mapping - OpenEvo Concept Studio</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            padding: 1.5rem;
+            background: #f3f4f6;
+        }
+        #graph-container {
+            min-height: 500px;
+            width: 100%;
+            height: 100%;
+            position: relative;
+        }
+        #causal-graph {
+            display: block;
+            width: 100%;
+            height: 100%;
+        }
+        .links path {
+            stroke: #78909c;
+            stroke-opacity: 0.6;
+            stroke-width: 2px;
+            fill: none;
+        }
+        .nodes rect {
+            stroke: #ffffff;
+            stroke-width: 1.5px;
+            rx: 12px;
+            ry: 12px;
+            cursor: grab;
+            transition: transform 0.2s ease;
+        }
+        .nodes rect:hover {
+            transform: scale(1.05);
+        }
+        .nodes rect:active {
+            cursor: grabbing;
+        }
+        .nodes text {
+            font-size: 9px;
+            font-family: sans-serif;
+            pointer-events: none;
+            text-anchor: middle;
+            dominant-baseline: central;
+            fill: #374151;
+        }
+        .nodes .text-bg {
+            fill: #ffffff;
+            opacity: 0.8;
+        }
+        .links text {
+            font-size: 8px;
+            fill: #374151;
+            pointer-events: none;
+        }
+        #tooltip {
+            position: absolute;
+            text-align: left;
+            width: auto;
+            max-width: 250px;
+            padding: 8px;
+            font: 11px sans-serif;
+            background: rgba(55, 65, 81, 0.95);
+            color: white;
+            border-radius: 4px;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.2s;
+            z-index: 1000;
+        }
+        #tooltip strong {
+            display: block;
+            margin-bottom: 4px;
+            font-weight: 600;
+        }
+        #schema-message {
+            text-align: center;
+            padding: 20px;
+            color: #6b7280;
+        }
+        .spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #2196f3;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-right: 8px;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 50;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0,0,0,0.5);
+        }
+        .modal-content {
+            background-color: #ffffff;
+            margin: 10% auto;
+            padding: 20px;
+            border: none;
+            width: 80%;
+            max-width: 500px;
+            border-radius: 0.75rem;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+        }
+        .close-button {
+            color: #6b7280;
+            float: right;
+            font-size: 24px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        .close-button:hover, .close-button:focus {
+            color: #374151;
+        }
+        #schema-search {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #d1d5db;
+            border-radius: 0.5rem;
+            margin-bottom: 1rem;
+        }
+    </style>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <h1 class="text-2xl font-semibold text-gray-800 mb-6">Causal Mapping</h1>
+    <p class="text-gray-600 mb-4">Select causal schemas to visualize and edit relationships for evolutionary processes.</p>
+    <div id="schema-message" class="hidden bg-yellow-50 text-yellow-700 p-4 rounded-md mb-4 flex items-center justify-center">
+        <span class="spinner"></span>Loading schema data...
+    </div>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div class="md:col-span-1 bg-white p-4 rounded-lg shadow">
+            <h3 class="text-lg font-semibold mb-3 border-b pb-2">Select Schemas</h3>
+            <input id="schema-search" type="text" placeholder="Search schemas..." class="mb-4" aria-label="Search schemas">
+            <div id="schema-list" class="space-y-2 max-h-80 overflow-y-auto mb-4"></div>
+            <button id="update-graph-btn" class="w-full px-4 py-2 bg-indigo-600 text-white font-semibold rounded-lg shadow hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 disabled:opacity-50" disabled>
+                Update Visualization
+            </button>
+            <h3 class="text-lg font-semibold mt-4 mb-3 border-b pb-2">Edit Graph</h3>
+            <div class="space-y-2">
+                <button id="add-node-btn" class="w-full px-4 py-2 bg-green-600 text-white font-semibold rounded-lg shadow hover:bg-green-700">Add Node</button>
+                <button id="add-link-btn" class="w-full px-4 py-2 bg-blue-600 text-white font-semibold rounded-lg shadow hover:bg-blue-700">Add Link</button>
+                <button id="clear-graph-btn" class="w-full px-4 py-2 bg-gray-600 text-white font-semibold rounded-lg shadow hover:bg-gray-700">Clear Graph</button>
+                <button id="undo-btn" class="w-full px-4 py-2 bg-gray-600 text-white font-semibold rounded-lg shadow hover:bg-gray-700 disabled:opacity-50" disabled>Undo</button>
+            </div>
+            <h3 class="text-lg font-semibold mt-4 mb-3 border-b pb-2">Export Graph</h3>
+            <div class="space-y-2">
+                <button id="export-csv-btn" class="w-full px-4 py-2 bg-purple-600 text-white font-semibold rounded-lg shadow hover:bg-purple-700">Export CSV</button>
+                <button id="export-json-btn" class="w-full px-4 py-2 bg-purple-600 text-white font-semibold rounded-lg shadow hover:bg-purple-700">Export JSON</button>
+                <button id="export-png-btn" class="w-full px-4 py-2 bg-purple-600 text-white font-semibold rounded-lg shadow hover:bg-purple-700">Export PNG</button>
+            </div>
+            <button id="help-btn" class="mt-4 w-full px-4 py-2 bg-gray-200 text-gray-700 font-semibold rounded-lg shadow hover:bg-gray-300">Help & Tips</button>
+        </div>
+        <div class="md:col-span-2 bg-white p-4 rounded-lg shadow min-h-[500px] flex flex-col">
+            <div class="flex justify-between mb-3">
+                <h3 class="text-lg font-semibold border-b pb-2">Causal Graph</h3>
+                <select id="layout-select" class="px-2 py-1 border rounded-md text-sm">
+                    <option value="force">Force-Directed</option>
+                    <option value="hierarchy">Hierarchical</option>
+                </select>
+            </div>
+            <div id="graph-container" class="flex-grow relative">
+                <svg id="causal-graph" class="w-full h-full"></svg>
+                <div id="tooltip"></div>
+                <p id="graph-placeholder" class="absolute inset-0 flex items-center justify-center text-gray-400">Select schemas and click "Update Visualization" to see the graph.</p>
+            </div>
+            <div id="node-details" class="mt-4 p-4 bg-gray-50 rounded-lg hidden">
+                <h4 class="text-md font-semibold mb-2">Node Details</h4>
+                <p id="node-label" class="text-sm text-gray-700"></p>
+                <p id="node-domain" class="text-sm text-gray-700"></p>
+                <p id="node-description" class="text-sm text-gray-700"></p>
+                <div class="mt-2 space-x-2">
+                    <button id="edit-node-btn" class="px-3 py-1 bg-blue-600 text-white rounded-lg hover:bg-blue-700">Edit</button>
+                    <button id="delete-node-btn" class="px-3 py-1 bg-red-600 text-white rounded-lg hover:bg-red-700">Delete</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="help-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-button" id="close-help-btn">×</span>
+            <h2 class="text-xl font-semibold mb-4">Causal Mapping Help</h2>
+            <p class="text-gray-600 mb-4">Use this tool to explore and customize causal relationships in evolutionary biology:</p>
+            <ul class="list-disc pl-5 text-gray-600 mb-4">
+                <li>Select schemas to load generalized causal patterns (e.g., Niche Selection).</li>
+                <li>Edit nodes and links to model specific cases (e.g., giraffe neck evolution).</li>
+                <li>Use the search bar to find schemas quickly.</li>
+                <li>Export your graph as CSV, JSON, or PNG for lessons or presentations.</li>
+                <li>Press Ctrl+Z to undo changes or use the Clear Graph button to start over.</li>
+            </ul>
+            <p class="text-gray-600">For more resources, visit the <a href="https://openevo.eva.mpg.de" class="text-blue-600 hover:underline">OpenEvo website</a>.</p>
+        </div>
+    </div>
+    <div id="node-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-button" id="close-node-modal">×</span>
+            <h2 id="node-modal-title" class="text-xl font-semibold mb-4"></h2>
+            <form id="node-form" class="space-y-4">
+                <div>
+                    <label for="node-label-input" class="block text-sm font-medium text-gray-700">Label</label>
+                    <input type="text" id="node-label-input" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2" required aria-required="true">
+                </div>
+                <div>
+                    <label for="node-domain-input" class="block text-sm font-medium text-gray-700">Causal Domain</label>
+                    <select id="node-domain-input" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2" required aria-required="true">
+                        <option value="Abiotic & Biotic Environments">Abiotic & Biotic Environments</option>
+                        <option value="Behavior">Behavior</option>
+                        <option value="Body">Body</option>
+                        <option value="Genes">Genes</option>
+                        <option value="Brain">Brain</option>
+                        <option value="Technologies & Cultural Knowledge">Technologies & Cultural Knowledge</option>
+                        <option value="Social Environment">Social Environment</option>
+                        <option value="Mixed">Mixed</option>
+                    </select>
+                </div>
+                <div>
+                    <label for="node-description-input" class="block text-sm font-medium text-gray-700">Description</label>
+                    <textarea id="node-description-input" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2" rows="4"></textarea>
+                </div>
+                <div class="flex justify-end space-x-2">
+                    <button type="button" id="cancel-node-btn" class="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300">Cancel</button>
+                    <button type="submit" id="save-node-btn" class="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700">Save</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    <div id="link-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-button" id="close-link-modal">×</span>
+            <h2 class="text-xl font-semibold mb-4">Add Link</h2>
+            <form id="link-form" class="space-y-4">
+                <div>
+                    <label for="link-source-input" class="block text-sm font-medium text-gray-700">Source Node</label>
+                    <select id="link-source-input" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2" required aria-required="true"></select>
+                </div>
+                <div>
+                    <label for="link-target-input" class="block text-sm font-medium text-gray-700">Target Node</label>
+                    <select id="link-target-input" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2" required aria-required="true"></select>
+                </div>
+                <div>
+                    <label for="link-relationship-input" class="block text-sm font-medium text-gray-700">Relationship</label>
+                    <input type="text" id="link-relationship-input" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2" required aria-required="true">
+                </div>
+                <div>
+                    <label for="link-description-input" class="block text-sm font-medium text-gray-700">Description</label>
+                    <textarea id="link-description-input" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2" rows="4"></textarea>
+                </div>
+                <div class="flex justify-end space-x-2">
+                    <button type="button" id="cancel-link-btn" class="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300">Cancel</button>
+                    <button type="submit" id="save-link-btn" class="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700">Save</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    <script>
+        // --- Constants ---
+        const SCHEMA_DATA_URL = 'https://raw.githubusercontent.com/dustineirdosh/concept-studio/main/data/causal_schemas.json';
+        const CAUSAL_DOMAINS = {
+            "Abiotic & Biotic Environments": "#2E7D32",
+            "Behavior": "#2196F3",
+            "Body": "#FF7043",
+            "Genes": "#FFCA28",
+            "Brain": "#EF5350",
+            "Technologies & Cultural Knowledge": "#6D4C41",
+            "Social Environment": "#AB47BC",
+            "Mixed": "#78909C"
+        };
+
+        // --- Global Variables ---
+        let fullSchemaData = [];
+        let allSchemas = [];
+        let currentNodes = [];
+        let currentLinks = [];
+        let simulation = null;
+        let history = [];
+        let historyIndex = -1;
+        let editingNode = null;
+
+        // --- DOM Elements ---
+        const schemaListDiv = document.getElementById('schema-list');
+        const schemaSearch = document.getElementById('schema-search');
+        const updateGraphBtn = document.getElementById('update-graph-btn');
+        const graphSvg = d3.select("#causal-graph");
+        const graphContainer = document.getElementById('graph-container');
+        const graphPlaceholder = document.getElementById('graph-placeholder');
+        const tooltip = d3.select("#tooltip");
+        const schemaMessageDiv = document.getElementById('schema-message');
+        const addNodeBtn = document.getElementById('add-node-btn');
+        const addLinkBtn = document.getElementById('add-link-btn');
+        const clearGraphBtn = document.getElementById('clear-graph-btn');
+        const undoBtn = document.getElementById('undo-btn');
+        const exportCsvBtn = document.getElementById('export-csv-btn');
+        const exportJsonBtn = document.getElementById('export-json-btn');
+        const exportPngBtn = document.getElementById('export-png-btn');
+        const helpBtn = document.getElementById('help-btn');
+        const helpModal = document.getElementById('help-modal');
+        const closeHelpBtn = document.getElementById('close-help-btn');
+        const layoutSelect = document.getElementById('layout-select');
+        const nodeDetailsDiv = document.getElementById('node-details');
+        const nodeLabel = document.getElementById('node-label');
+        const nodeDomain = document.getElementById('node-domain');
+        const nodeDescription = document.getElementById('node-description');
+        const editNodeBtn = document.getElementById('edit-node-btn');
+        const deleteNodeBtn = document.getElementById('delete-node-btn');
+        const nodeModal = document.getElementById('node-modal');
+        const nodeModalTitle = document.getElementById('node-modal-title');
+        const nodeForm = document.getElementById('node-form');
+        const nodeLabelInput = document.getElementById('node-label-input');
+        const nodeDomainInput = document.getElementById('node-domain-input');
+        const nodeDescriptionInput = document.getElementById('node-description-input');
+        const closeNodeModal = document.getElementById('close-node-modal');
+        const cancelNodeBtn = document.getElementById('cancel-node-btn');
+        const saveNodeBtn = document.getElementById('save-node-btn');
+        const linkModal = document.getElementById('link-modal');
+        const linkForm = document.getElementById('link-form');
+        const linkSourceInput = document.getElementById('link-source-input');
+        const linkTargetInput = document.getElementById('link-target-input');
+        const linkRelationshipInput = document.getElementById('link-relationship-input');
+        const linkDescriptionInput = document.getElementById('link-description-input');
+        const closeLinkModal = document.getElementById('close-link-modal');
+        const cancelLinkBtn = document.getElementById('cancel-link-btn');
+        const saveLinkBtn = document.getElementById('save-link-btn');
+
+        // --- Initialization ---
+        document.addEventListener('DOMContentLoaded', initializeCausalMapping);
+
+        async function initializeCausalMapping() {
+            showSchemaMessage("Loading schema data...", false);
+            updateGraphBtn.disabled = true;
+
+            try {
+                const response = await fetch(SCHEMA_DATA_URL);
+                if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+                fullSchemaData = await response.json();
+                if (!Array.isArray(fullSchemaData)) throw new Error("Invalid data structure received.");
+                
+                // Validate unique schema IDs
+                const schemaDetails = fullSchemaData.map(s => ({ id: s.schema_id, name: s.name }));
+                console.log("Schema Details:", JSON.stringify(schemaDetails, null, 2));
+                const schemaIds = fullSchemaData.map(s => s.schema_id);
+                const uniqueSchemaIds = new Set(schemaIds);
+                if (schemaIds.length !== uniqueSchemaIds.size) {
+                    console.warn("Duplicate schema IDs detected:", schemaIds);
+                }
+                console.log(`Fetched ${uniqueSchemaIds.size} unique schemas.`);
+            } catch (error) {
+                console.error("Error fetching schema data:", error);
+                console.warn("Falling back to mock data due to fetch failure.");
+                fullSchemaData = [
+                    {
+                        schema_id: "niche_selection",
+                        name: "Niche Selection",
+                        description: "Behavior influences the environmental conditions experienced, which select for specific traits.",
+                        nodes: [
+                            { id: "n1", label: "Behavior", causal_domain: "Behavior", description: "Actions or patterns of an organism interacting with its environment." },
+                            { id: "n2", label: "Environment", causal_domain: "Abiotic & Biotic Environments", description: "External conditions, including abiotic and biotic factors." },
+                            { id: "n3", label: "Trait", causal_domain: "Body", description: "A physical or behavioral characteristic shaped by natural selection." }
+                        ],
+                        links: [
+                            { source: "n1", target: "n2", relationship: "influences experience of", description: "Behavior shapes which environmental conditions the organism encounters." },
+                            { source: "n2", target: "n3", relationship: "creates selection of", description: "Environmental conditions select for traits that enhance survival." }
+                        ]
+                    }
+                ];
+                showSchemaMessage("Using mock data due to network error.", true);
+            }
+
+            allSchemas = fullSchemaData.map(schema => ({
+                id: schema.schema_id,
+                name: schema.name
+            }));
+
+            populateSchemaCheckboxes();
+
+            updateGraphBtn.addEventListener('click', updateVisualization);
+            addNodeBtn.addEventListener('click', () => openNodeModal('add'));
+            addLinkBtn.addEventListener('click', openLinkModal);
+            clearGraphBtn.addEventListener('click', clearGraph);
+            undoBtn.addEventListener('click', undo);
+            exportCsvBtn.addEventListener('click', exportCsv);
+            exportJsonBtn.addEventListener('click', exportJson);
+            exportPngBtn.addEventListener('click', exportPng);
+            helpBtn.addEventListener('click', () => helpModal.style.display = "block");
+            closeHelpBtn.addEventListener('click', () => helpModal.style.display = "none");
+            window.addEventListener('click', (event) => {
+                if (event.target == helpModal) helpModal.style.display = "none";
+                if (event.target == nodeModal) closeNodeModalFunc();
+                if (event.target == linkModal) closeLinkModalFunc();
+            });
+            layoutSelect.addEventListener('change', updateVisualization);
+            schemaSearch.addEventListener('input', filterSchemas);
+
+            document.addEventListener('keydown', (event) => {
+                if (event.ctrlKey && event.key === 'z') {
+                    event.preventDefault();
+                    undo();
+                }
+            });
+
+            updateGraphBtn.disabled = false;
+            hideSchemaMessage();
+        }
+
+        function populateSchemaCheckboxes() {
+            schemaListDiv.innerHTML = '';
+            const controlsDiv = document.createElement('div');
+            controlsDiv.classList.add('flex', 'items-center', 'mb-2', 'border-b', 'pb-2', 'space-x-2');
+            const selectAllCheckbox = document.createElement('input');
+            selectAllCheckbox.type = 'checkbox';
+            selectAllCheckbox.id = 'select-all-schemas';
+            selectAllCheckbox.classList.add('h-4', 'w-4', 'text-indigo-600', 'border-gray-300', 'rounded', 'focus:ring-indigo-500', 'cursor-pointer');
+            selectAllCheckbox.setAttribute('aria-label', 'Select all schemas');
+            const selectAllLabel = document.createElement('label');
+            selectAllLabel.htmlFor = 'select-all-schemas';
+            selectAllLabel.textContent = 'Select All';
+            selectAllLabel.classList.add('ml-2', 'block', 'text-sm', 'text-gray-700', 'cursor-pointer', 'font-medium');
+            const deselectAllButton = document.createElement('button');
+            deselectAllButton.textContent = 'Deselect All';
+            deselectAllButton.classList.add('px-2', 'py-1', 'bg-gray-200', 'text-gray-700', 'text-sm', 'rounded', 'hover:bg-gray-300', 'focus:outline-none');
+            deselectAllButton.setAttribute('aria-label', 'Deselect all schemas');
+            controlsDiv.appendChild(selectAllCheckbox);
+            controlsDiv.appendChild(selectAllLabel);
+            controlsDiv.appendChild(deselectAllButton);
+            schemaListDiv.appendChild(controlsDiv);
+
+            allSchemas.forEach(schema => {
+                const div = document.createElement('div');
+                div.classList.add('flex', 'items-center', 'schema-item');
+                div.setAttribute('data-name', schema.name.toLowerCase());
+                const checkbox = document.createElement('input');
+                checkbox.type = 'checkbox';
+                checkbox.id = `schema-${schema.id}`;
+                checkbox.value = schema.id;
+                checkbox.classList.add('h-4', 'w-4', 'text-indigo-600', 'border-gray-300', 'rounded', 'focus:ring-indigo-500', 'cursor-pointer');
+                checkbox.setAttribute('aria-label', `Select ${schema.name} schema`);
+                const label = document.createElement('label');
+                label.htmlFor = checkbox.id;
+                label.textContent = schema.name;
+                label.classList.add('ml-2', 'block', 'text-sm', 'text-gray-700', 'cursor-pointer');
+                div.appendChild(checkbox);
+                div.appendChild(label);
+                schemaListDiv.appendChild(div);
+            });
+
+            selectAllCheckbox.addEventListener('change', () => {
+                const checkboxes = schemaListDiv.querySelectorAll('input[type="checkbox"]:not(#select-all-schemas)');
+                checkboxes.forEach(cb => {
+                    if (cb.parentElement.style.display !== 'none') cb.checked = selectAllCheckbox.checked;
+                });
+            });
+
+            deselectAllButton.addEventListener('click', () => {
+                const checkboxes = schemaListDiv.querySelectorAll('input[type="checkbox"]');
+                checkboxes.forEach(cb => cb.checked = false);
+            });
+
+            const checkboxes = schemaListDiv.querySelectorAll('input[type="checkbox"]:not(#select-all-schemas)');
+            checkboxes.forEach(cb => {
+                cb.addEventListener('change', () => {
+                    const visibleCheckboxes = Array.from(checkboxes).filter(cb => cb.parentElement.style.display !== 'none');
+                    const allChecked = visibleCheckboxes.every(cb => cb.checked);
+                    selectAllCheckbox.checked = allChecked && visibleCheckboxes.length > 0;
+                });
+            });
+        }
+
+        function filterSchemas() {
+            const query = schemaSearch.value.toLowerCase();
+            const schemaItems = schemaListDiv.querySelectorAll('.schema-item');
+            schemaItems.forEach(item => {
+                const name = item.getAttribute('data-name');
+                item.style.display = name.includes(query) ? 'flex' : 'none';
+            });
+            const visibleCheckboxes = Array.from(schemaListDiv.querySelectorAll('input[type="checkbox"]:not(#select-all-schemas)'))
+                .filter(cb => cb.parentElement.style.display !== 'none');
+            const selectAllCheckbox = document.getElementById('select-all-schemas');
+            selectAllCheckbox.checked = visibleCheckboxes.length > 0 && visibleCheckboxes.every(cb => cb.checked);
+        }
+
+        function showSchemaMessage(message, isError = false) {
+            schemaMessageDiv.innerHTML = isError 
+                ? message 
+                : `<span class="spinner"></span>${message}`;
+            schemaMessageDiv.classList.remove('hidden', 'bg-yellow-50', 'text-yellow-700', 'bg-red-50', 'text-red-700');
+            schemaMessageDiv.classList.add(isError ? 'bg-red-50' : 'bg-yellow-50', isError ? 'text-red-700' : 'text-yellow-700');
+        }
+
+        function hideSchemaMessage() {
+            schemaMessageDiv.classList.add('hidden');
+        }
+
+        function saveState() {
+            history = history.slice(0, historyIndex + 1);
+            history.push({
+                nodes: JSON.parse(JSON.stringify(currentNodes)),
+                links: JSON.parse(JSON.stringify(currentLinks))
+            });
+            historyIndex++;
+            undoBtn.disabled = historyIndex <= 0;
+        }
+
+        function undo() {
+            if (historyIndex <= 0) return;
+            historyIndex--;
+            const state = history[historyIndex];
+            currentNodes = JSON.parse(JSON.stringify(state.nodes));
+            currentLinks = JSON.parse(JSON.stringify(state.links));
+            drawGraph(currentNodes, currentLinks);
+            undoBtn.disabled = historyIndex <= 0;
+        }
+
+        function clearGraph() {
+            currentNodes = [];
+            currentLinks = [];
+            saveState();
+            clearVisualization();
+        }
+
+        function openNodeModal(mode, node = null) {
+            editingNode = node;
+            nodeModalTitle.textContent = mode === 'add' ? 'Add Node' : 'Edit Node';
+            nodeLabelInput.value = node ? node.label : '';
+            nodeDomainInput.value = node ? node.causal_domain : 'Mixed';
+            nodeDescriptionInput.value = node ? node.description : '';
+            nodeModal.style.display = 'block';
+            nodeLabelInput.focus();
+        }
+
+        function closeNodeModalFunc() {
+            nodeModal.style.display = 'none';
+            nodeForm.reset();
+            editingNode = null;
+        }
+
+        function openLinkModal() {
+            if (currentNodes.length < 2) {
+                alert("At least two nodes are required to create a link.");
+                return;
+            }
+            linkSourceInput.innerHTML = currentNodes.map(n => `<option value="${n.id}">${n.label}</option>`).join('');
+            linkTargetInput.innerHTML = currentNodes.map(n => `<option value="${n.id}">${n.label}</option>`).join('');
+            linkRelationshipInput.value = '';
+            linkDescriptionInput.value = '';
+            linkModal.style.display = 'block';
+            linkSourceInput.focus();
+        }
+
+        function closeLinkModalFunc() {
+            linkModal.style.display = 'none';
+            linkForm.reset();
+        }
+
+        nodeForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const label = nodeLabelInput.value.trim();
+            const causal_domain = nodeDomainInput.value;
+            const description = nodeDescriptionInput.value.trim();
+            if (!label) {
+                alert("Node label is required.");
+                return;
+            }
+            if (editingNode) {
+                const index = currentNodes.findIndex(n => n.id === editingNode.id);
+                currentNodes[index] = {
+                    ...currentNodes[index],
+                    label,
+                    causal_domain,
+                    description,
+                    color: CAUSAL_DOMAINS[causal_domain]
+                };
+            } else {
+                const newId = `n${currentNodes.length + 1}`;
+                currentNodes.push({
+                    id: newId,
+                    label,
+                    causal_domain,
+                    description,
+                    color: CAUSAL_DOMAINS[causal_domain]
+                });
+            }
+            saveState();
+            drawGraph(currentNodes, currentLinks);
+            if (editingNode) showNodeDetails(currentNodes.find(n => n.id === editingNode.id));
+            closeNodeModalFunc();
+        });
+
+        linkForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const sourceId = linkSourceInput.value;
+            const targetId = linkTargetInput.value;
+            const relationship = linkRelationshipInput.value.trim();
+            const description = linkDescriptionInput.value.trim();
+            if (!sourceId || !targetId || !relationship) {
+                alert("Source, target, and relationship are required.");
+                return;
+            }
+            if (sourceId === targetId) {
+                alert("Source and target nodes must be different.");
+                return;
+            }
+            currentLinks.push({
+                source: sourceId,
+                target: targetId,
+                relationship,
+                description
+            });
+            saveState();
+            drawGraph(currentNodes, currentLinks);
+            closeLinkModalFunc();
+        });
+
+        closeNodeModal.addEventListener('click', closeNodeModalFunc);
+        cancelNodeBtn.addEventListener('click', closeNodeModalFunc);
+        closeLinkModal.addEventListener('click', closeLinkModalFunc);
+        cancelLinkBtn.addEventListener('click', closeLinkModalFunc);
+
+        function updateVisualization() {
+            clearVisualization(); // Clear existing graph
+
+            const selectedSchemas = Array.from(schemaListDiv.querySelectorAll('input[type="checkbox"]:not(#select-all-schemas):checked'))
+                .map(cb => cb.value);
+
+            if (selectedSchemas.length === 0) {
+                graphPlaceholder.textContent = "Please select at least one schema to visualize.";
+                graphPlaceholder.style.display = 'flex';
+                return;
+            }
+
+            graphPlaceholder.style.display = 'none';
+
+            const nodeMap = new Map();
+            const links = [];
+
+            selectedSchemas.forEach(schemaId => {
+                const schema = fullSchemaData.find(s => s.schema_id === schemaId);
+                if (!schema) return;
+
+                console.log(`Processing schema: ${schema.name} (${schema.schema_id})`);
+
+                schema.nodes.forEach(node => {
+                    if (!node.id || !node.label) {
+                        console.warn(`Invalid node in schema ${schema.schema_id}:`, node);
+                        return;
+                    }
+                    // Use schema_id prefix for unique node IDs
+                    const uniqueId = `${schema.schema_id}_${node.id}`;
+                    nodeMap.set(uniqueId, {
+                        id: uniqueId,
+                        label: node.label,
+                        causal_domain: node.causal_domain || 'Mixed',
+                        description: node.description || '',
+                        color: CAUSAL_DOMAINS[node.causal_domain] || CAUSAL_DOMAINS.Mixed,
+                        schema_id: schema.schema_id // Track source schema
+                    });
+                });
+
+                schema.links.forEach(link => {
+                    if (!link.source || !link.target) {
+                        console.warn(`Invalid link in schema ${schema.schema_id}:`, link);
+                        return;
+                    }
+                    const sourceId = `${schema.schema_id}_${link.source}`;
+                    const targetId = `${schema.schema_id}_${link.target}`;
+                    if (nodeMap.has(sourceId) && nodeMap.has(targetId)) {
+                        links.push({
+                            source: sourceId,
+                            target: targetId,
+                            relationship: link.relationship || 'Related',
+                            description: link.description || '',
+                            schema_id: schema.schema_id // Track source schema
+                        });
+                    } else {
+                        console.warn(`Link skipped in ${schema.schema_id}: Source ${sourceId} or Target ${targetId} not found.`);
+                    }
+                });
+
+                console.log(`Schema ${schema.schema_id} added ${schema.nodes.length} nodes and ${schema.links.length} links.`);
+            });
+
+            currentNodes = Array.from(nodeMap.values());
+            currentLinks = links; // No link cap
+
+            console.log(`Total nodes: ${currentNodes.length}, Total links: ${links.length}`);
+
+            if (links.length > 50) {
+                showSchemaMessage("Warning: Large number of links may affect readability.", true);
+            }
+
+            saveState();
+            drawGraph(currentNodes, currentLinks);
+        }
+
+        function showNodeDetails(node) {
+            nodeLabel.textContent = `Label: ${node.label}`;
+            nodeDomain.textContent = `Causal Domain: ${node.causal_domain}`;
+            nodeDescription.textContent = `Description: ${node.description}`;
+            nodeDetailsDiv.classList.remove('hidden');
+            editNodeBtn.onclick = () => openNodeModal('edit', node);
+            deleteNodeBtn.onclick = () => deleteNode(node);
+        }
+
+        function deleteNode(node) {
+            if (confirm(`Delete node "${node.label}"? This will also remove related links.`)) {
+                currentNodes = currentNodes.filter(n => n.id !== node.id);
+                currentLinks = currentLinks.filter(l => l.source !== node.id && l.target !== node.id);
+                saveState();
+                drawGraph(currentNodes, currentLinks);
+                nodeDetailsDiv.classList.add('hidden');
+            }
+        }
+
+        function clearVisualization() {
+            if (simulation) simulation.stop();
+            graphSvg.selectAll("*").remove();
+            graphPlaceholder.style.display = 'flex';
+            graphPlaceholder.textContent = "Select schemas and click \"Update Visualization\" to see the graph.";
+            nodeDetailsDiv.classList.add('hidden');
+            hideSchemaMessage();
+        }
+
+        function drawGraph(nodes, links) {
+            showSchemaMessage("Rendering graph...", false);
+
+            try {
+                // Validate inputs
+                if (!nodes || nodes.length === 0) {
+                    console.error("No nodes provided to drawGraph.");
+                    graphPlaceholder.textContent = "Cannot draw graph: No nodes available.";
+                    graphPlaceholder.style.display = 'flex';
+                    hideSchemaMessage();
+                    return;
+                }
+
+                console.log("Drawing graph with nodes:", JSON.stringify(nodes), "and links:", JSON.stringify(links));
+
+                const containerRect = graphContainer.getBoundingClientRect();
+                let width = containerRect.width;
+                let height = containerRect.height;
+
+                if (width <= 0 || height <= 0) {
+                    console.error("Invalid container dimensions:", { width, height });
+                    graphPlaceholder.textContent = "Cannot draw graph: Invalid container size.";
+                    graphPlaceholder.style.display = 'flex';
+                    hideSchemaMessage();
+                    return;
+                }
+
+                graphSvg.attr("viewBox", [0, 0, width, height]);
+
+                const g = graphSvg.append("g");
+                const zoom = d3.zoom()
+                    .scaleExtent([0.5, 3])
+                    .on("zoom", (event) => g.attr("transform", event.transform));
+                graphSvg.call(zoom);
+
+                const layout = layoutSelect.value;
+
+                // Initialize node positions
+                nodes.forEach(node => {
+                    if (!node.x || !node.y || isNaN(node.x) || isNaN(node.y)) {
+                        node.x = width / 2 + (Math.random() - 0.5) * 200; // Wider spread
+                        node.y = height / 2 + (Math.random() - 0.5) * 200;
+                    }
+                });
+
+                if (layout === 'force') {
+                    simulation = d3.forceSimulation(nodes)
+                        .force("link", d3.forceLink(links).id(d => d.id).distance(100).strength(0.4)) // Adjusted for more links
+                        .force("charge", d3.forceManyBody().strength(-300)) // Stronger repulsion
+                        .force("center", d3.forceCenter(width / 2, height / 2).strength(0.8))
+                        .force("collide", d3.forceCollide().radius(60).strength(1.0)) // Larger collision radius
+                        .force("x", d3.forceX(width / 2).strength(0.15))
+                        .force("y", d3.forceY(height / 2).strength(0.15));
+                } else {
+                    try {
+                        const root = d3.stratify()
+                            .id(d => d.id)
+                            .parentId(d => links.find(l => l.target === d.id)?.source)(nodes);
+                        const tree = d3.tree().size([height - 100, width - 200]);
+                        tree(root);
+                        nodes.forEach(node => {
+                            const d = root.descendants().find(d => d.id === node.id);
+                            if (d) {
+                                node.x = d.y + 100;
+                                node.y = d.x + 50;
+                            }
+                        });
+                    } catch (e) {
+                        console.warn("Hierarchical layout failed, falling back to grid:", e);
+                        nodes.forEach((node, i) => {
+                            node.x = (i % Math.ceil(Math.sqrt(nodes.length))) * (width / Math.ceil(Math.sqrt(nodes.length))) + 50;
+                            node.y = Math.floor(i / Math.ceil(Math.sqrt(nodes.length))) * (height / Math.floor(Math.sqrt(nodes.length))) + 50;
+                        });
+                    }
+                    links.forEach(link => {
+                        link.source = nodes.find(n => n.id === link.source) || link.source;
+                        link.target = nodes.find(n => n.id === link.target) || link.target;
+                    });
+                }
+
+                // Links
+                const linkGroup = g.append("g")
+                    .attr("class", "links")
+                    .selectAll("g")
+                    .data(links)
+                    .join("g");
+
+                linkGroup.append("path")
+                    .attr("d", d => {
+                        const source = typeof d.source === 'string' ? nodes.find(n => n.id === d.source) : d.source;
+                        const target = typeof d.target === 'string' ? nodes.find(n => n.id === d.target) : d.target;
+                        if (!source || !target) return "";
+                        return `M${source.x},${source.y} L${target.x},${target.y}`;
+                    })
+                    .attr("stroke", "#78909c")
+                    .attr("stroke-opacity", 0.6)
+                    .attr("stroke-width", 2);
+
+                linkGroup.append("text")
+                    .attr("dy", -5)
+                    .attr("text-anchor", "middle")
+                    .text(d => d.relationship)
+                    .attr("font-size", "8px")
+                    .attr("fill", "#374151");
+
+                // Nodes
+                const nodeGroup = g.append("g")
+                    .attr("class", "nodes")
+                    .selectAll("g")
+                    .data(nodes, d => d.id)
+                    .join("g")
+                    .attr("class", "node")
+                    .call(drag(simulation));
+
+                console.log("nodeGroup selection:", nodeGroup);
+
+                nodeGroup.append("rect")
+                    .attr("width", 80)
+                    .attr("height", 40)
+                    .attr("x", -40)
+                    .attr("y", -20)
+                    .attr("fill", d => d.color || CAUSAL_DOMAINS.Mixed)
+                    .attr("stroke", "#ffffff")
+                    .attr("stroke-width", 1.5)
+                    .attr("rx", 12)
+                    .attr("ry", 12);
+
+                nodeGroup.append("rect")
+                    .attr("class", "text-bg")
+                    .attr("width", 76)
+                    .attr("height", 16)
+                    .attr("x", -38)
+                    .attr("y", -8)
+                    .attr("fill", "#ffffff")
+                    .attr("opacity", 0.8);
+
+                nodeGroup.append("text")
+                    .text(d => d.label)
+                    .attr("font-size", "9px")
+                    .attr("text-anchor", "middle")
+                    .attr("dominant-baseline", "central")
+                    .attr("fill", "#374151");
+
+                nodeGroup.transition()
+                    .duration(500)
+                    .style("opacity", 1);
+
+                nodeGroup.on("mouseover", (event, d) => {
+                    tooltip.transition().duration(200).style("opacity", 1);
+                    tooltip.html(`<strong>${d.label}</strong>Domain: ${d.causal_domain}<br>${d.description}`)
+                        .style("left", (event.pageX + 10) + "px")
+                        .style("top", (event.pageY + 10) + "px");
+                })
+                .on("mouseout", () => {
+                    tooltip.transition().duration(300).style("opacity", 0);
+                })
+                .on("click", (event, d) => {
+                    showNodeDetails(d);
+                });
+
+                if (layout === 'force') {
+                    simulation.on("tick", () => {
+                        linkGroup.select("path")
+                            .attr("d", d => {
+                                const source = typeof d.source === 'string' ? nodes.find(n => n.id === d.source) : d.source;
+                                const target = typeof d.target === 'string' ? nodes.find(n => n.id === d.target) : d.target;
+                                if (!source || !target) return "";
+                                return `M${source.x},${source.y} L${target.x},${target.y}`;
+                            });
+
+                        linkGroup.select("text")
+                            .attr("x", d => {
+                                const source = typeof d.source === 'string' ? nodes.find(n => n.id === d.source) : d.source;
+                                const target = typeof d.target === 'string' ? nodes.find(n => n.id === d.target) : d.target;
+                                return (source.x + target.x) / 2;
+                            })
+                            .attr("y", d => {
+                                const source = typeof d.source === 'string' ? nodes.find(n => n.id === d.source) : d.source;
+                                const target = typeof d.target === 'string' ? nodes.find(n => n.id === d.target) : d.target;
+                                return (source.y + target.y) / 2 - 5;
+                            });
+
+                        nodeGroup
+                            .attr("transform", d => {
+                                const x = Math.max(40, Math.min(width - 40, d.x));
+                                const y = Math.max(20, Math.min(height - 20, d.y));
+                                return `translate(${x},${y})`;
+                            });
+                    });
+                } else {
+                    nodeGroup
+                        .attr("transform", d => `translate(${d.x},${d.y})`);
+
+                    linkGroup.select("path")
+                        .attr("d", d => {
+                            const source = typeof d.source === 'string' ? nodes.find(n => n.id === d.source) : d.source;
+                            const target = typeof d.target === 'string' ? nodes.find(n => n.id === d.target) : d.target;
+                            if (!source || !target) return "";
+                            return `M${source.x},${source.y} L${target.x},${target.y}`;
+                        });
+
+                    linkGroup.select("text")
+                        .attr("x", d => {
+                            const source = typeof d.source === 'string' ? nodes.find(n => n.id === d.source) : d.source;
+                            const target = typeof d.target === 'string' ? nodes.find(n => n.id === d.target) : d.target;
+                            return (source.x + target.x) / 2;
+                        })
+                        .attr("y", d => {
+                            const source = typeof d.source === 'string' ? nodes.find(n => n.id === d.source) : d.source;
+                            const target = typeof d.target === 'string' ? nodes.find(n => n.id === d.target) : d.target;
+                            return (source.y + target.y) / 2 - 5;
+                        });
+                }
+
+                window.addEventListener('resize', () => {
+                    const newRect = graphContainer.getBoundingClientRect();
+                    width = newRect.width;
+                    height = newRect.height;
+                    if (width > 0 && height > 0) {
+                        graphSvg.attr("viewBox", [0, 0, width, height]);
+                        if (simulation) {
+                            simulation.force("center", d3.forceCenter(width / 2, height / 2).strength(0.8));
+                            simulation.alpha(0.1).restart();
+                        }
+                    }
+                });
+
+                hideSchemaMessage();
+            } catch (error) {
+                console.error("Error in drawGraph:", error);
+                showSchemaMessage("Failed to render graph: " + error.message, true);
+                graphPlaceholder.textContent = "Error rendering graph. Please try a different schema.";
+                graphPlaceholder.style.display = 'flex';
+            }
+        }
+
+        function drag(simulation) {
+            function dragstarted(event, d) {
+                if (!event.active && simulation) simulation.alphaTarget(0.3).restart();
+                d.fx = d.x;
+                d.fy = d.y;
+            }
+            function dragged(event, d) {
+                d.fx = event.x;
+                d.fy = event.y;
+            }
+            function dragended(event, d) {
+                if (!event.active && simulation) simulation.alphaTarget(0);
+                d.fx = null;
+                d.fy = null;
+            }
+            return d3.drag()
+                .on("start", dragstarted)
+                .on("drag", dragged)
+                .on("end", dragended);
+        }
+
+        function exportCsv() {
+            const csvContent = [
+                "source,target,relationship",
+                ...currentLinks.map(link => `"${link.source}","${link.target}","${link.relationship}"`)
+            ].join("\n");
+            const blob = new Blob([csvContent], { type: 'text/csv' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'causal_graph.csv';
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+
+        function exportJson() {
+            const jsonContent = JSON.stringify({ nodes: currentNodes, links: currentLinks }, null, 2);
+            const blob = new Blob([jsonContent], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'causal_graph.json';
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+
+        function exportPng() {
+            html2canvas(document.getElementById('graph-container')).then(canvas => {
+                const a = document.createElement('a');
+                a.href = canvas.toDataURL('image/png');
+                a.download = 'causal_graph.png';
+                a.click();
+            });
+        }
+    </script>
+</body>
+</html>

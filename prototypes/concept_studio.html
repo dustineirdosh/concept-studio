@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OpenEvo Concept Studio</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            overflow-y: hidden;
+        }
+        .sidebar-tab.active {
+            background-color: #e0f2fe;
+            color: #0c4a6e;
+            font-weight: 600;
+        }
+        .sidebar-header {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+        }
+        #content-frame {
+            border: none;
+            width: 100%;
+            height: calc(100vh - 4rem); /* Adjust for header/footer if needed */
+        }
+    </style>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body class="bg-gray-100">
+    <div class="flex h-screen">
+        <aside class="w-64 bg-white shadow-md flex flex-col flex-shrink-0">
+            <div class="p-4 border-b border-gray-200 flex flex-col items-center justify-center">
+                <img src="https://openevo.eva.mpg.de/wp-content/uploads/OpenEvo-Logo-new-2023.png"
+                     alt="OpenEvo Logo" class="h-10 w-auto"
+                     onerror="this.onerror=null; this.src='https://placehold.co/150x40/cccccc/ffffff?text=OpenEvo';">
+                <span class="text-xl font-semibold text-gray-700 mt-2">Concept Studio</span>
+            </div>
+            <nav class="flex-grow p-4 space-y-2 overflow-y-auto">
+                <a href="#" class="sidebar-tab active flex items-center space-x-3 p-2 rounded-lg text-gray-600 hover:bg-gray-100" data-target="projects.html">
+                    <span class="text-xl">🗂️</span> <span>My Projects</span>
+                </a>
+                <a href="#" class="sidebar-tab flex items-center space-x-3 p-2 rounded-lg text-gray-600 hover:bg-gray-100" data-target="frameworks.html">
+                    <span class="text-xl">🌐</span> <span>Frameworks</span>
+                </a>
+                <a href="#" class="sidebar-tab flex items-center space-x-3 p-2 rounded-lg text-gray-600 hover:bg-gray-100" data-target="library.html">
+                    <span class="text-xl">🧠</span> <span>Concept Library</span>
+                </a>
+		<a href="#" class="sidebar-tab flex items-center space-x-3 p-2 rounded-lg text-gray-600 hover:bg-gray-100" data-target="curriculum_mapping.html">
+                    <span class="text-xl">🗺️</span> <span>Curriculum Mapping</span> 
+                </a>
+                <a href="#" class="sidebar-tab flex items-center space-x-3 p-2 rounded-lg text-gray-600 hover:bg-gray-100" data-target="case_manager.html">
+                    <span class="text-xl">👩‍💻</span> <span>Case Study Manager</span>
+                </a>
+		<a href="#" class="sidebar-tab flex items-center space-x-3 p-2 rounded-lg text-gray-600 hover:bg-gray-100" data-target="causal_mapping.html">
+                    <span class="text-xl">🗺️</span> <span>Causal Mapping</span>
+                </a>	
+ 		<a href="#" class="sidebar-tab flex items-center space-x-3 p-2 rounded-lg text-gray-600 hover:bg-gray-100" data-target="settings.html">
+                    <span class="text-xl">⚙️</span> <span>Settings</span>
+                </a>
+            </nav>
+            <div class="p-4 border-t border-gray-200 text-sm text-gray-500">
+                User: Teacher Name
+            </div>
+        </aside>
+        <main class="flex-1">
+            <iframe id="content-frame" src="projects.html"></iframe>
+        </main>
+    </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const sidebarTabs = document.querySelectorAll('.sidebar-tab');
+            const contentFrame = document.getElementById('content-frame');
+
+            sidebarTabs.forEach(tab => {
+                tab.addEventListener('click', (event) => {
+                    event.preventDefault();
+                    const targetPage = tab.getAttribute('data-target');
+                    console.log(`Loading page: ${targetPage}`);
+
+                    if (!targetPage) {
+                        console.error(`No data-target specified for tab.`);
+                        return;
+                    }
+
+                    sidebarTabs.forEach(t => t.classList.remove('active'));
+                    tab.classList.add('active');
+                    contentFrame.src = targetPage;
+                });
+            });
+        });
+    </script>
+</body>
+</html>
