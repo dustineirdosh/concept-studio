@@ -1,0 +1,953 @@
+[
+    {
+        "schema_id": "niche_selection",
+        "name": "Niche Selection",
+        "description": "Behavior influences the environmental conditions experienced, which select for specific traits.",
+        "nodes": [
+            {
+                "id": "n1",
+                "label": "Behavior",
+                "causal_domain": "Behavior",
+                "description": "Actions or patterns of an organism interacting with its environment."
+            },
+            {
+                "id": "n2",
+                "label": "Environment",
+                "causal_domain": "Abiotic & Biotic Environments",
+                "description": "External conditions, including abiotic (e.g., climate) and biotic (e.g., other species) factors."
+            },
+            {
+                "id": "n3",
+                "label": "Trait",
+                "causal_domain": "Body",
+                "description": "A physical or behavioral characteristic shaped by natural selection."
+            }
+        ],
+        "links": [
+            {
+                "source": "n1",
+                "target": "n2",
+                "relationship": "influences experience of",
+                "description": "Behavior shapes which environmental conditions the organism encounters."
+            },
+            {
+                "source": "n2",
+                "target": "n3",
+                "relationship": "creates selection of",
+                "description": "Environmental conditions select for traits that enhance survival and reproduction."
+            }
+        ]
+    },
+    {
+        "schema_id": "niche_construction",
+        "name": "Niche Construction",
+        "description": "Organisms modify their environment through behavior, influencing trait selection.",
+        "nodes": [
+            {
+                "id": "n1",
+                "label": "Behavior",
+                "causal_domain": "Behavior",
+                "description": "Actions that alter the organism's surroundings."
+            },
+            {
+                "id": "n2",
+                "label": "Environment",
+                "causal_domain": "Abiotic & Biotic Environments",
+                "description": "The modified or natural environmental conditions."
+            },
+            {
+                "id": "n3",
+                "label": "Trait",
+                "causal_domain": "Body",
+                "description": "Characteristics shaped by the modified environment."
+            }
+        ],
+        "links": [
+            {
+                "source": "n1",
+                "target": "n2",
+                "relationship": "influences features of",
+                "description": "Behavior actively modifies environmental conditions."
+            },
+            {
+                "source": "n2",
+                "target": "n3",
+                "relationship": "creates selection of",
+                "description": "The altered environment selects for specific traits."
+            }
+        ]
+    },
+    {
+        "schema_id": "co_evolution",
+        "name": "Co-Evolution",
+        "description": "Two organisms mutually influence each other's evolutionary trajectories.",
+        "nodes": [
+            {
+                "id": "n1",
+                "label": "Organism A",
+                "causal_domain": "Mixed",
+                "description": "One species or organism in the co-evolutionary relationship."
+            },
+            {
+                "id": "n2",
+                "label": "Organism B",
+                "causal_domain": "Mixed",
+                "description": "The other species or organism in the co-evolutionary relationship."
+            }
+        ],
+        "links": [
+            {
+                "source": "n1",
+                "target": "n2",
+                "relationship": "creates selection of",
+                "description": "Organism A exerts selective pressure on Organism B."
+            },
+            {
+                "source": "n2",
+                "target": "n1",
+                "relationship": "creates selection of",
+                "description": "Organism B exerts selective pressure on Organism A."
+            }
+        ]
+    },
+    {
+        "schema_id": "domestication_simple",
+        "name": "Domestication - Simple",
+        "description": "A trait in one organism enables the development of another, which in turn selects for the trait.",
+        "nodes": [
+            {
+                "id": "n1",
+                "label": "Trait Organism A",
+                "causal_domain": "Body",
+                "description": "A characteristic of Organism A that facilitates domestication."
+            },
+            {
+                "id": "n2",
+                "label": "Organism B",
+                "causal_domain": "Mixed",
+                "description": "The organism being domesticated or influenced."
+            }
+        ],
+        "links": [
+            {
+                "source": "n1",
+                "target": "n2",
+                "relationship": "enables development of",
+                "description": "The trait in Organism A supports the development or survival of Organism B."
+            },
+            {
+                "source": "n2",
+                "target": "n1",
+                "relationship": "creates selection of",
+                "description": "Organism B selects for the trait in Organism A."
+            }
+        ]
+    },
+    {
+        "schema_id": "gene_to_phenotype_simple",
+        "name": "Gene to Phenotype - Simple",
+        "description": "A gene leads to a protein, which results in a phenotype.",
+        "nodes": [
+            {
+                "id": "n1",
+                "label": "Gene",
+                "causal_domain": "Genes",
+                "description": "A segment of DNA coding for a specific function."
+            },
+            {
+                "id": "n2",
+                "label": "Protein",
+                "causal_domain": "Body",
+                "description": "A molecule produced from gene expression."
+            },
+            {
+                "id": "n3",
+                "label": "Phenotype",
+                "causal_domain": "Body",
+                "description": "The observable trait resulting from gene expression."
+            }
+        ],
+        "links": [
+            {
+                "source": "n1",
+                "target": "n2",
+                "relationship": "enables development of",
+                "description": "The gene codes for the production of a protein."
+            },
+            {
+                "source": "n2",
+                "target": "n3",
+                "relationship": "enables development of",
+                "description": "The protein contributes to the formation of the phenotype."
+            }
+        ]
+    },
+    {
+        "schema_id": "gene_to_phenotype_complex",
+        "name": "Gene to Phenotype - Complex",
+        "description": "A gene regulatory network leads to a complex trait.",
+        "nodes": [
+            {
+                "id": "n1",
+                "label": "GRN",
+                "causal_domain": "Genes",
+                "description": "A gene regulatory network controlling gene expression."
+            },
+            {
+                "id": "n2",
+                "label": "Trait",
+                "causal_domain": "Body",
+                "description": "A complex characteristic resulting from the GRN."
+            }
+        ],
+        "links": [
+            {
+                "source": "n1",
+                "target": "n2",
+                "relationship": "enables development of",
+                "description": "The GRN orchestrates the development of a complex trait."
+            }
+        ]
+    },
+    {
+        "schema_id": "grn",
+        "name": "Gene Regulatory Network (GRN)",
+        "description": "Interactions between genes and their products drive gene expression.",
+        "nodes": [
+            {
+                "id": "n1",
+                "label": "Gene",
+                "causal_domain": "Genes",
+                "description": "A DNA segment involved in regulation."
+            },
+            {
+                "id": "n2",
+                "label": "Gene Product",
+                "causal_domain": "Body",
+                "description": "A protein or RNA produced by a gene."
+            }
+        ],
+        "links": [
+            {
+                "source": "n1",
+                "target": "n1",
+                "relationship": "influences development/expression of",
+                "description": "Genes regulate the expression of other genes within the network."
+            },
+            {
+                "source": "n1",
+                "target": "n2",
+                "relationship": "influences development/expression of",
+                "description": "Genes produce gene products that influence the network."
+            },
+            {
+                "source": "n2",
+                "target": "n1",
+                "relationship": "influences development/expression of",
+                "description": "Gene products feed back to regulate gene expression."
+            }
+        ]
+    },
+    {
+        "schema_id": "developmental_plasticity",
+        "name": "Developmental Plasticity",
+        "description": "Environmental and genetic factors interact to shape trait development.",
+        "nodes": [
+            {
+                "id": "n1",
+                "label": "Environment",
+                "causal_domain": "Abiotic & Biotic Environments",
+                "description": "External conditions affecting development."
+            },
+            {
+                "id": "n2",
+                "label": "Gene",
+                "causal_domain": "Genes",
+                "description": "Genetic factors influencing trait formation."
+            },
+            {
+                "id": "n3",
+                "label": "Trait",
+                "causal_domain": "Body",
+                "description": "A characteristic shaped by plasticity."
+            },
+            {
+                "id": "n4",
+                "label": "Physical Laws",
+                "causal_domain": "Abiotic & Biotic Environments",
+                "description": "Fundamental physical principles constraining development."
+            }
+        ],
+        "links": [
+            {
+                "source": "n1",
+                "target": "n3",
+                "relationship": "enables development of",
+                "description": "Environmental conditions shape trait development."
+            },
+            {
+                "source": "n2",
+                "target": "n3",
+                "relationship": "enables development of",
+                "description": "Genes contribute to trait development."
+            },
+            {
+                "source": "n1",
+                "target": "n2",
+                "relationship": "influences expression of",
+                "description": "The environment affects gene expression."
+            },
+            {
+                "source": "n4",
+                "target": "n3",
+                "relationship": "enables development of",
+                "description": "Physical laws set boundaries for trait development."
+            }
+        ]
+    },
+    {
+        "schema_id": "developmental_bias",
+        "name": "Developmental Bias",
+        "description": "Genetic and developmental processes bias trait evolution.",
+        "nodes": [
+            {
+                "id": "n1",
+                "label": "Gene",
+                "causal_domain": "Genes",
+                "description": "Genes involved in developmental pathways."
+            },
+            {
+                "id": "n2",
+                "label": "Protein",
+                "causal_domain": "Body",
+                "description": "Proteins produced by genes."
+            },
+            {
+                "id": "n3",
+                "label": "Trait",
+                "causal_domain": "Body",
+                "description": "A characteristic shaped by developmental bias."
+            }
+        ],
+        "links": [
+            {
+                "source": "n1",
+                "target": "n1",
+                "relationship": "enables development/expression of",
+                "description": "Genes regulate other genes in the developmental pathway."
+            },
+            {
+                "source": "n1",
+                "target": "n2",
+                "relationship": "enables development of",
+                "description": "Genes produce proteins critical for development."
+            },
+            {
+                "source": "n2",
+                "target": "n3",
+                "relationship": "enables development of",
+                "description": "Proteins contribute to trait formation."
+            },
+            {
+                "source": "n3",
+                "target": "n3",
+                "relationship": "enables development of",
+                "description": "Existing traits constrain or facilitate new trait development."
+            }
+        ]
+    },
+    {
+        "schema_id": "genetic_assimilation",
+        "name": "Genetic Assimilation",
+        "description": "Environmental or behavioral factors lead to traits that become genetically fixed.",
+        "nodes": [
+            {
+                "id": "n1",
+                "label": "X",
+                "causal_domain": "Mixed",
+                "description": "An external factor (e.g., environment, behavior) driving selection."
+            },
+            {
+                "id": "n2",
+                "label": "Trait",
+                "causal_domain": "Body",
+                "description": "A characteristic initially induced by the environment."
+            },
+            {
+                "id": "n3",
+                "label": "Gene",
+                "causal_domain": "Genes",
+                "description": "Genes that become fixed to support the trait."
+            }
+        ],
+        "links": [
+            {
+                "source": "n1",
+                "target": "n2",
+                "relationship": "creates selection of",
+                "description": "The external factor selects for the trait."
+            },
+            {
+                "source": "n2",
+                "target": "n3",
+                "relationship": "creates selection of",
+                "description": "The trait selects for genes that stabilize it."
+            },
+            {
+                "source": "n3",
+                "target": "n2",
+                "relationship": "enables development of",
+                "description": "Genes enable the stable development of the trait."
+            }
+        ]
+    },
+    {
+        "schema_id": "cultural_transmission",
+        "name": "Cultural Transmission",
+        "description": "Traits are passed through cultural mechanisms like learning and teaching.",
+        "nodes": [
+            {
+                "id": "n1",
+                "label": "Social Learning",
+                "causal_domain": "Technologies & Cultural Knowledge",
+                "description": "Learning behaviors or knowledge from others."
+            },
+            {
+                "id": "n2",
+                "label": "Language",
+                "causal_domain": "Technologies & Cultural Knowledge",
+                "description": "A system for communicating knowledge."
+            },
+            {
+                "id": "n3",
+                "label": "Teaching",
+                "causal_domain": "Technologies & Cultural Knowledge",
+                "description": "Active instruction to transmit knowledge."
+            },
+            {
+                "id": "n4",
+                "label": "Trait",
+                "causal_domain": "Body",
+                "description": "A culturally transmitted characteristic or behavior."
+            }
+        ],
+        "links": [
+            {
+                "source": "n1",
+                "target": "n4",
+                "relationship": "enables transmission of",
+                "description": "Social learning facilitates trait transmission."
+            },
+            {
+                "source": "n2",
+                "target": "n4",
+                "relationship": "enables transmission of",
+                "description": "Language supports the spread of traits."
+            },
+            {
+                "source": "n3",
+                "target": "n4",
+                "relationship": "enables transmission of",
+                "description": "Teaching actively transmits traits."
+            }
+        ]
+    },
+    {
+        "schema_id": "gene_culture_coevolution",
+        "name": "Gene-Culture Coevolution",
+        "description": "Genes and culture mutually influence trait evolution.",
+        "nodes": [
+            {
+                "id": "n1",
+                "label": "Gene",
+                "causal_domain": "Genes",
+                "description": "Genetic factors influencing traits."
+            },
+            {
+                "id": "n2",
+                "label": "Trait",
+                "causal_domain": "Body",
+                "description": "A characteristic shaped by genes and culture."
+            },
+            {
+                "id": "n3",
+                "label": "Culture",
+                "causal_domain": "Technologies & Cultural Knowledge",
+                "description": "Shared knowledge and practices within a population."
+            }
+        ],
+        "links": [
+            {
+                "source": "n1",
+                "target": "n2",
+                "relationship": "enables development of",
+                "description": "Genes contribute to trait development."
+            },
+            {
+                "source": "n3",
+                "target": "n2",
+                "relationship": "creates selection of",
+                "description": "Cultural practices select for specific traits."
+            },
+            {
+                "source": "n2",
+                "target": "n3",
+                "relationship": "enables development of",
+                "description": "Traits influence the development of cultural practices."
+            }
+        ]
+    },
+    {
+        "schema_id": "transmission",
+        "name": "Transmission",
+        "description": "Entities transfer information or resources to others.",
+        "nodes": [
+            {
+                "id": "n1",
+                "label": "Entity A",
+                "causal_domain": "Mixed",
+                "description": "The source of information or resources."
+            },
+            {
+                "id": "n2",
+                "label": "Entity B",
+                "causal_domain": "Mixed",
+                "description": "The recipient of information or resources."
+            }
+        ],
+        "links": [
+            {
+                "source": "n1",
+                "target": "n2",
+                "relationship": "conveys information to",
+                "description": "Entity A shares knowledge or signals with Entity B."
+            },
+            {
+                "source": "n1",
+                "target": "n2",
+                "relationship": "conveys resources to",
+                "description": "Entity A transfers material or energy to Entity B."
+            }
+        ]
+    },
+    {
+        "schema_id": "sexual_selection",
+        "name": "Sexual Selection",
+        "description": "Mate choice drives the evolution of specific traits.",
+        "nodes": [
+            {
+                "id": "n1",
+                "label": "Mating Partner",
+                "causal_domain": "Social Environment",
+                "description": "Individuals choosing mates based on traits."
+            },
+            {
+                "id": "n2",
+                "label": "Trait",
+                "causal_domain": "Body",
+                "description": "A characteristic preferred by mating partners."
+            }
+        ],
+        "links": [
+            {
+                "source": "n1",
+                "target": "n2",
+                "relationship": "creates selection of",
+                "description": "Mate choice selects for specific traits."
+            }
+        ]
+    },
+    {
+        "schema_id": "social_selection",
+        "name": "Social Selection",
+        "description": "Social interactions drive trait evolution.",
+        "nodes": [
+            {
+                "id": "n1",
+                "label": "Social Environment",
+                "causal_domain": "Social Environment",
+                "description": "The social context influencing individuals."
+            },
+            {
+                "id": "n2",
+                "label": "Trait",
+                "causal_domain": "Body",
+                "description": "A characteristic shaped by social interactions."
+            }
+        ],
+        "links": [
+            {
+                "source": "n1",
+                "target": "n2",
+                "relationship": "creates selection of",
+                "description": "The social environment selects for specific traits."
+            }
+        ]
+    },
+    {
+        "schema_id": "behavior_led_evolution",
+        "name": "Behavior-Led Evolution",
+        "description": "Behavior drives trait and gene evolution through agency.",
+        "nodes": [
+            {
+                "id": "n1",
+                "label": "Genes",
+                "causal_domain": "Genes",
+                "description": "Genetic factors underlying traits."
+            },
+            {
+                "id": "n2",
+                "label": "Trait",
+                "causal_domain": "Body",
+                "description": "A characteristic enabling behavior."
+            },
+            {
+                "id": "n3",
+                "label": "Behavior",
+                "causal_domain": "Behavior",
+                "description": "Actions driven by agency."
+            },
+            {
+                "id": "n4",
+                "label": "Agency",
+                "causal_domain": "Brain",
+                "description": "The capacity to make decisions and act intentionally."
+            }
+        ],
+        "links": [
+            {
+                "source": "n1",
+                "target": "n2",
+                "relationship": "enables development of",
+                "description": "Genes contribute to trait development."
+            },
+            {
+                "source": "n2",
+                "target": "n3",
+                "relationship": "enables development of",
+                "description": "Traits enable specific behaviors."
+            },
+            {
+                "source": "n4",
+                "target": "n3",
+                "relationship": "motivates",
+                "description": "Agency drives behavioral choices."
+            },
+            {
+                "source": "n3",
+                "target": "n2",
+                "relationship": "creates selection of",
+                "description": "Behavior selects for traits that enhance fitness."
+            },
+            {
+                "source": "n2",
+                "target": "n1",
+                "relationship": "creates selection of",
+                "description": "Traits select for underlying genes."
+            }
+        ]
+    },
+    {
+        "schema_id": "microbiome_transmission",
+        "name": "Microbiome Transmission (Ecological Inheritance)",
+        "description": "Microbiomes influence traits and are transmitted through behavior or development.",
+        "nodes": [
+            {
+                "id": "n1",
+                "label": "Microbiome",
+                "causal_domain": "Abiotic & Biotic Environments",
+                "description": "Microbial communities influencing organism function."
+            },
+            {
+                "id": "n2",
+                "label": "Trait",
+                "causal_domain": "Body",
+                "description": "A characteristic shaped by the microbiome."
+            },
+            {
+                "id": "n3",
+                "label": "Behavior",
+                "causal_domain": "Behavior",
+                "description": "Actions that transmit microbiomes."
+            },
+            {
+                "id": "n4",
+                "label": "Development",
+                "causal_domain": "Body",
+                "description": "Developmental processes transmitting microbiomes."
+            },
+            {
+                "id": "n5",
+                "label": "Environment",
+                "causal_domain": "Abiotic & Biotic Environments",
+                "description": "External conditions selecting for traits."
+            }
+        ],
+        "links": [
+            {
+                "source": "n1",
+                "target": "n2",
+                "relationship": "enables development of",
+                "description": "The microbiome contributes to trait development."
+            },
+            {
+                "source": "n3",
+                "target": "n1",
+                "relationship": "enables transmission of",
+                "description": "Behavior facilitates microbiome transmission."
+            },
+            {
+                "source": "n4",
+                "target": "n1",
+                "relationship": "enables transmission of",
+                "description": "Developmental processes transmit microbiomes."
+            },
+            {
+                "source": "n5",
+                "target": "n2",
+                "relationship": "creates selection of",
+                "description": "The environment selects for microbiome-influenced traits."
+            }
+        ]
+    },
+    {
+        "schema_id": "frequency_dependent_selection",
+        "name": "Frequency-Dependent Selection",
+        "description": "The frequency of a trait influences its selection.",
+        "nodes": [
+            {
+                "id": "n1",
+                "label": "Frequency of Trait A",
+                "causal_domain": "Mixed",
+                "description": "The prevalence of a specific trait in a population."
+            },
+            {
+                "id": "n2",
+                "label": "Trait A",
+                "causal_domain": "Body",
+                "description": "The characteristic under frequency-dependent selection."
+            }
+        ],
+        "links": [
+            {
+                "source": "n1",
+                "target": "n2",
+                "relationship": "influences selection of",
+                "description": "The frequency of the trait affects its selective advantage."
+            }
+        ]
+    },
+    {
+        "schema_id": "multilevel_selection",
+        "name": "Multilevel Selection",
+        "description": "Selection operates at individual and group levels, favoring cooperative traits.",
+        "nodes": [
+            {
+                "id": "n1",
+                "label": "Competition Between Groups",
+                "causal_domain": "Social Environment",
+                "description": "Competition among groups in a population."
+            },
+            {
+                "id": "n2",
+                "label": "Cooperative Groups",
+                "causal_domain": "Social Environment",
+                "description": "Groups exhibiting cooperative behaviors."
+            },
+            {
+                "id": "n3",
+                "label": "Competition Within Groups",
+                "causal_domain": "Social Environment",
+                "description": "Competition among individuals within a group."
+            },
+            {
+                "id": "n4",
+                "label": "Selfish Traits",
+                "causal_domain": "Body",
+                "description": "Traits that benefit individuals at the expense of the group."
+            },
+            {
+                "id": "n5",
+                "label": "Cooperative Traits",
+                "causal_domain": "Body",
+                "description": "Traits that benefit the group."
+            }
+        ],
+        "links": [
+            {
+                "source": "n1",
+                "target": "n2",
+                "relationship": "creates selection of",
+                "description": "Between-group competition favors cooperative groups."
+            },
+            {
+                "source": "n3",
+                "target": "n4",
+                "relationship": "creates selection of",
+                "description": "Within-group competition favors selfish traits."
+            },
+            {
+                "source": "n2",
+                "target": "n5",
+                "relationship": "creates selection of",
+                "description": "Cooperative groups select for cooperative traits."
+            },
+            {
+                "source": "n5",
+                "target": "n2",
+                "relationship": "enable",
+                "description": "Cooperative traits enable the formation of cooperative groups."
+            }
+        ]
+    },
+    {
+        "schema_id": "cultural_multilevel_selection",
+        "name": "Cultural Multilevel Selection",
+        "description": "Culture and group competition drive cooperative trait evolution.",
+        "nodes": [
+            {
+                "id": "n1",
+                "label": "Culture",
+                "causal_domain": "Technologies & Cultural Knowledge",
+                "description": "Shared knowledge and practices shaping behavior."
+            },
+            {
+                "id": "n2",
+                "label": "Cooperative Trait",
+                "causal_domain": "Body",
+                "description": "Traits that enhance group cooperation."
+            },
+            {
+                "id": "n3",
+                "label": "Competition Between Groups",
+                "causal_domain": "Social Environment",
+                "description": "Competition among cultural groups."
+            },
+            {
+                "id": "n4",
+                "label": "Cooperative Groups",
+                "causal_domain": "Social Environment",
+                "description": "Groups with cooperative cultural practices."
+            }
+        ],
+        "links": [
+            {
+                "source": "n1",
+                "target": "n2",
+                "relationship": "influences development of",
+                "description": "Culture shapes the development of cooperative traits."
+            },
+            {
+                "source": "n1",
+                "target": "n2",
+                "relationship": "creates selection of",
+                "description": "Culture selects for cooperative traits."
+            },
+            {
+                "source": "n3",
+                "target": "n4",
+                "relationship": "creates selection of",
+                "description": "Between-group competition favors cooperative groups."
+            },
+            {
+                "source": "n4",
+                "target": "n2",
+                "relationship": "creates selection of",
+                "description": "Cooperative groups select for cooperative traits."
+            },
+            {
+                "source": "n2",
+                "target": "n4",
+                "relationship": "enable",
+                "description": "Cooperative traits enable cooperative groups."
+            }
+        ]
+    },
+    {
+        "schema_id": "agential_causation",
+        "name": "Agential Causation",
+        "description": "An agent's cognitive processes drive behavior that influences the environment.",
+        "nodes": [
+            {
+                "id": "n1",
+                "label": "Agent",
+                "causal_domain": "Brain",
+                "description": "An organism with cognitive capacities for sensing and decision-making."
+            },
+            {
+                "id": "n2",
+                "label": "Environment",
+                "causal_domain": "Abiotic & Biotic Environments",
+                "description": "The external context the agent interacts with."
+            },
+            {
+                "id": "n3",
+                "label": "Body",
+                "causal_domain": "Body",
+                "description": "The agent's physical state influencing its actions."
+            },
+            {
+                "id": "n4",
+                "label": "Goals",
+                "causal_domain": "Brain",
+                "description": "The agent's objectives driving behavior."
+            },
+            {
+                "id": "n5",
+                "label": "Behavior",
+                "causal_domain": "Behavior",
+                "description": "Actions taken by the agent."
+            }
+        ],
+        "links": [
+            {
+                "source": "n1",
+                "target": "n2",
+                "relationship": "senses",
+                "description": "The agent perceives environmental conditions."
+            },
+            {
+                "source": "n1",
+                "target": "n3",
+                "relationship": "senses",
+                "description": "The agent monitors its own physical state."
+            },
+            {
+                "source": "n1",
+                "target": "n2",
+                "relationship": "models",
+                "description": "The agent builds a mental model of the environment."
+            },
+            {
+                "source": "n1",
+                "target": "n4",
+                "relationship": "has",
+                "description": "The agent possesses goals driving its actions."
+            },
+            {
+                "source": "n4",
+                "target": "n5",
+                "relationship": "motivate",
+                "description": "Goals drive the agent's behavior."
+            },
+            {
+                "source": "n5",
+                "target": "n2",
+                "relationship": "influences",
+                "description": "Behavior modifies the environment."
+            },
+            {
+                "source": "n1",
+                "target": "n2",
+                "relationship": "predicts",
+                "description": "The agent anticipates environmental changes."
+            },
+            {
+                "source": "n1",
+                "target": "n5",
+                "relationship": "learns",
+                "description": "The agent learns new behaviors through experience."
+            }
+        ]
+    }
+]
