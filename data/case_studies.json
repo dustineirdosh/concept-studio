@@ -1,0 +1,631 @@
+[
+  {
+    "case_id": "cactus_spines_gain",
+    "title": "Evolution of Spines in Cacti",
+    "species": "Cactus",
+    "trait": "Spines",
+    "type": "Between",
+    "gain_loss": "Gain",
+    "evolutionary_explanation": "Ancestral cacti developed spine-like structures as plastic responses to herbivory. This defensive adaptation constructed a niche with reduced predation, leading to genetic assimilation of the spine-producing trait.",
+    "verification": "Supported",
+    "validity_analysis": "The explanation aligns with evidence that spines evolved as a defense against herbivores, with niche construction reinforcing the trait. Cacti spines are modified leaves or buds, evolving under herbivory pressure.",
+    "sources": ["Evolution of spines in cacti", "Studies on desert plant adaptations"],
+    "relevant_schemas": [
+      {
+        "schema_id": "niche_construction",
+        "description": "Spines modified the environment by deterring herbivores, creating a low-predation niche that favored spine-producing traits."
+      },
+      {
+        "schema_id": "developmental_plasticity",
+        "description": "Initial spine-like structures arose as plastic responses to herbivory, later genetically assimilated."
+      }
+    ],
+    "causal_map": {
+      "nodes": [
+        {
+          "id": "n1",
+          "label": "Herbivory Response",
+          "causal_domain": "Behavior",
+          "description": "Cacti exhibit plastic developmental responses to herbivore damage, producing spine-like structures.",
+          "color": "#2196F3"
+        },
+        {
+          "id": "n2",
+          "label": "Predation Pressure",
+          "causal_domain": "Abiotic & Biotic Environments",
+          "description": "Herbivores in the desert environment exert selective pressure on cacti.",
+          "color": "#2E7D32"
+        },
+        {
+          "id": "n3",
+          "label": "Spine Development",
+          "causal_domain": "Body",
+          "description": "Protective spines evolve as a physical trait to deter herbivores.",
+          "color": "#FF7043"
+        },
+        {
+          "id": "n4",
+          "label": "Spine-Producing Genes",
+          "causal_domain": "Genes",
+          "description": "Genetic variants that reliably produce spines are selected over time.",
+          "color": "#FFCA28"
+        }
+      ],
+      "links": [
+        {
+          "source": "n1",
+          "target": "n2",
+          "relationship": "influences features of",
+          "description": "Plastic responses to herbivory modify the predation environment by deterring herbivores."
+        },
+        {
+          "source": "n2",
+          "target": "n3",
+          "relationship": "creates selection of",
+          "description": "Reduced predation pressure selects for cacti with effective spines."
+        },
+        {
+          "source": "n1",
+          "target": "n3",
+          "relationship": "enables development of",
+          "description": "Plastic responses initiate spine development, which becomes genetically fixed."
+        },
+        {
+          "source": "n3",
+          "target": "n4",
+          "relationship": "influences expression of",
+          "description": "Spine development drives selection for genes that produce spines reliably."
+        }
+      ]
+    }
+  },
+  {
+    "case_id": "cheetah_running_gain",
+    "title": "Evolution of Running Ability in Cheetahs",
+    "species": "Cheetah",
+    "trait": "Running Ability",
+    "type": "Between",
+    "gain_loss": "Gain",
+    "evolutionary_explanation": "Ancestral cheetahs that were slightly faster had access to more prey in open habitats. By selecting this niche, they created selection pressures favoring faster developmental pathways, gradually evolving extraordinary running ability.",
+    "verification": "Supported",
+    "validity_analysis": "Niche selection in open habitats driving speed is well-documented in cheetah evolution. Cheetahs’ speed (up to 60-70 mph) evolved in savannas, where it provided a hunting advantage.",
+    "sources": ["Evolution of locomotion in mammals", "Fossil and biomechanical evidence"],
+    "relevant_schemas": [
+      {
+        "schema_id": "niche_selection",
+        "description": "Faster cheetahs selected open savanna niches, creating selection for speed."
+      },
+      {
+        "schema_id": "developmental_bias",
+        "description": "Developmental pathways biased toward faster muscle and bone growth were favored."
+      }
+    ],
+    "causal_map": {
+      "nodes": [
+        {
+          "id": "n1",
+          "label": "Hunting Behavior",
+          "causal_domain": "Behavior",
+          "description": "Cheetahs pursue prey in open habitats.",
+          "color": "#2196F3"
+        },
+        {
+          "id": "n2",
+          "label": "Savanna Environment",
+          "causal_domain": "Abiotic & Biotic Environments",
+          "description": "Open habitats favor speed for hunting success.",
+          "color": "#2E7D32"
+        },
+        {
+          "id": "n3",
+          "label": "Running Ability",
+          "causal_domain": "Body",
+          "description": "Enhanced muscle and skeletal traits for high-speed running.",
+          "color": "#FF7043"
+        }
+      ],
+      "links": [
+        {
+          "source": "n1",
+          "target": "n2",
+          "relationship": "influences experience of",
+          "description": "Hunting behavior exposes cheetahs to open savanna conditions."
+        },
+        {
+          "source": "n2",
+          "target": "n3",
+          "relationship": "creates selection of",
+          "description": "Savanna environment selects for traits enabling faster running."
+        }
+      ]
+    }
+  },
+  {
+    "case_id": "dodder_haustoria_gain",
+    "title": "Evolution of Haustoria in Dodder",
+    "species": "Dodder",
+    "trait": "Haustoria",
+    "type": "Between",
+    "gain_loss": "Gain",
+    "evolutionary_explanation": "Ancestral dodder plants likely developed haustoria-like structures as plastic responses to contact with host plants. This parasitic adaptation allowed them to construct a new nutritional niche, leading to genetic assimilation of haustoria-producing traits.",
+    "verification": "Supported",
+    "validity_analysis": "The parasitic lifestyle of dodder supports this explanation, with haustoria evolving for nutrient uptake.",
+    "sources": ["Evolution of parasitism in plants"],
+    "relevant_schemas": [
+      {
+        "schema_id": "niche_construction",
+        "description": "Haustoria enabled a parasitic niche, reducing competition for nutrients."
+      },
+      {
+        "schema_id": "developmental_plasticity",
+        "description": "Plastic responses to host contact initiated haustoria development."
+      }
+    ],
+    "causal_map": {
+      "nodes": [
+        {
+          "id": "n1",
+          "label": "Host Contact Response",
+          "causal_domain": "Behavior",
+          "description": "Dodder exhibits plastic growth toward host plants.",
+          "color": "#2196F3"
+        },
+        {
+          "id": "n2",
+          "label": "Host Environment",
+          "causal_domain": "Abiotic & Biotic Environments",
+          "description": "Host plants provide a nutrient-rich niche.",
+          "color": "#2E7D32"
+        },
+        {
+          "id": "n3",
+          "label": "Haustoria Development",
+          "causal_domain": "Body",
+          "description": "Specialized structures for nutrient uptake from hosts.",
+          "color": "#FF7043"
+        }
+      ],
+      "links": [
+        {
+          "source": "n1",
+          "target": "n2",
+          "relationship": "influences features of",
+          "description": "Plastic growth constructs a parasitic niche by accessing host nutrients."
+        },
+        {
+          "source": "n2",
+          "target": "n3",
+          "relationship": "creates selection of",
+          "description": "Parasitic niche selects for effective haustoria."
+        }
+      ]
+    }
+  },
+  {
+    "case_id": "penguin_flight_loss",
+    "title": "Loss of Flight Ability in Penguins",
+    "species": "Penguin",
+    "trait": "Flight Ability",
+    "type": "Between",
+    "gain_loss": "Loss",
+    "evolutionary_explanation": "Ancestral flying birds exploiting aquatic feeding niches experienced selection favoring swimming over flight. Through plasticity, wing structures shifted function to underwater 'flight,' with genetic accommodation solidifying flightlessness.",
+    "verification": "Supported",
+    "validity_analysis": "Penguins’ shift to swimming is a classic example of niche-driven trait loss, supported by fossil evidence.",
+    "sources": ["Evolution of flightlessness in penguins", "Biomechanical studies"],
+    "relevant_schemas": [
+      {
+        "schema_id": "niche_selection",
+        "description": "Aquatic niches favored swimming over flight."
+      },
+      {
+        "schema_id": "developmental_plasticity",
+        "description": "Plastic changes in wing function facilitated the transition to flightlessness."
+      }
+    ],
+    "causal_map": {
+      "nodes": [
+        {
+          "id": "n1",
+          "label": "Foraging Behavior",
+          "causal_domain": "Behavior",
+          "description": "Penguins forage in aquatic environments.",
+          "color": "#2196F3"
+        },
+        {
+          "id": "n2",
+          "label": "Aquatic Environment",
+          "causal_domain": "Abiotic & Biotic Environments",
+          "description": "Marine habitats favor swimming efficiency.",
+          "color": "#2E7D32"
+        },
+        {
+          "id": "n3",
+          "label": "Wing Morphology",
+          "causal_domain": "Body",
+          "description": "Wings adapted for swimming, losing flight capability.",
+          "color": "#FF7043"
+        }
+      ],
+      "links": [
+        {
+          "source": "n1",
+          "target": "n2",
+          "relationship": "influences experience of",
+          "description": "Foraging behavior exposes penguins to aquatic conditions."
+        },
+        {
+          "source": "n2",
+          "target": "n3",
+          "relationship": "creates selection of",
+          "description": "Aquatic environment selects for wing adaptations for swimming."
+        }
+      ]
+    }
+  },
+  {
+    "case_id": "rose_thorns_gain",
+    "title": "Emergence of Thorns in Rose Populations",
+    "species": "Rose",
+    "trait": "Thorns",
+    "type": "Within",
+    "gain_loss": "Gain",
+    "evolutionary_explanation": "Herbivory pressure triggered plastic developmental responses producing thorn-like structures in some roses. These defensive modifications could be maintained through epigenetic inheritance before genetic accommodation.",
+    "verification": "Supported",
+    "validity_analysis": "Prickles as a defense are supported by genetic findings linked to the LOG gene family.",
+    "sources": ["Scientists traced roses’ thorny origins"],
+    "relevant_schemas": [
+      {
+        "schema_id": "developmental_plasticity",
+        "description": "Plastic responses to herbivory initiated prickle development."
+      },
+      {
+        "schema_id": "epigenetic_inheritance",
+        "description": "Epigenetic markers maintained prickle phenotypes within the population."
+      }
+    ],
+    "causal_map": {
+      "nodes": [
+        {
+          "id": "n1",
+          "label": "Herbivory Stress",
+          "causal_domain": "Abiotic & Biotic Environments",
+          "description": "Herbivore pressure on rose plants.",
+          "color": "#2E7D32"
+        },
+        {
+          "id": "n2",
+          "label": "Prickle Development",
+          "causal_domain": "Body",
+          "description": "Plastic formation of prickles as a defense.",
+          "color": "#FF7043"
+        },
+        {
+          "id": "n3",
+          "label": "Epigenetic Markers",
+          "causal_domain": "Genes",
+          "description": "Epigenetic changes supporting prickle production.",
+          "color": "#FFCA28"
+        }
+      ],
+      "links": [
+        {
+          "source": "n1",
+          "target": "n2",
+          "relationship": "enables development of",
+          "description": "Herbivory triggers plastic prickle development."
+        },
+        {
+          "source": "n2",
+          "target": "n3",
+          "relationship": "influences expression of",
+          "description": "Prickle development promotes epigenetic changes for persistence."
+        }
+      ]
+    }
+  },
+  {
+    "case_id": "salamander_vision_loss",
+    "title": "Loss of Vision in Cave Salamanders",
+    "species": "Salamander",
+    "trait": "Vision",
+    "type": "Between",
+    "gain_loss": "Loss",
+    "evolutionary_explanation": "Salamanders colonizing dark cave environments experienced relaxed selection for vision. Plastic reductions in eye development were favored, leading to genetic assimilation of eyelessness.",
+    "verification": "Supported",
+    "validity_analysis": "Vision loss in cave salamanders is a well-documented regressive adaptation, supported by genetic and ecological studies.",
+    "sources": ["Evolution of eye development in caves", "The Evolution of Gene Expression Underlying Vision Loss"],
+    "relevant_schemas": [
+      {
+        "schema_id": "niche_selection",
+        "description": "Dark cave niches relaxed selection for vision."
+      },
+      {
+        "schema_id": "developmental_plasticity",
+        "description": "Plastic reductions in eye development were genetically assimilated."
+      }
+    ],
+    "causal_map": {
+      "nodes": [
+        {
+          "id": "n1",
+          "label": "Cave Foraging",
+          "causal_domain": "Behavior",
+          "description": "Salamanders forage in dark cave environments.",
+          "color": "#2196F3"
+        },
+        {
+          "id": "n2",
+          "label": "Dark Cave Environment",
+          "causal_domain": "Abiotic & Biotic Environments",
+          "description": "Lightless caves reduce the need for vision.",
+          "color": "#2E7D32"
+        },
+        {
+          "id": "n3",
+          "label": "Eye Morphology",
+          "causal_domain": "Body",
+          "description": "Reduced or absent eyes due to relaxed selection.",
+          "color": "#FF7043"
+        }
+      ],
+      "links": [
+        {
+          "source": "n1",
+          "target": "n2",
+          "relationship": "influences experience of",
+          "description": "Foraging behavior exposes salamanders to dark conditions."
+        },
+        {
+          "source": "n2",
+          "target": "n3",
+          "relationship": "creates selection of",
+          "description": "Dark environment relaxes selection for functional eyes."
+        }
+      ]
+    }
+  },
+  {
+    "case_id": "snail_poison_gain",
+    "title": "Evolution of Poison in Snails",
+    "species": "Snail",
+    "trait": "Poison",
+    "type": "Between",
+    "gain_loss": "Gain",
+    "evolutionary_explanation": "Snails with slightly toxic metabolic byproducts gained protection from predators. This defensive capability constructed a niche with reduced predation, selecting for more effective toxins.",
+    "verification": "Supported",
+    "validity_analysis": "Toxins in snails (e.g., cone snails) evolved for defense/predation, supported by studies on venom evolution.",
+    "sources": ["Evolution of venoms in cone snails"],
+    "relevant_schemas": [
+      {
+        "schema_id": "niche_construction",
+        "description": "Toxins created a low-predation niche, favoring toxic snails."
+      },
+      {
+        "schema_id": "developmental_plasticity",
+        "description": "Initial toxin production arose as a plastic response to predation."
+      }
+    ],
+    "causal_map": {
+      "nodes": [
+        {
+          "id": "n1",
+          "label": "Toxin Production",
+          "causal_domain": "Behavior",
+          "description": "Snails produce toxic byproducts in response to predation.",
+          "color": "#2196F3"
+        },
+        {
+          "id": "n2",
+          "label": "Predation Pressure",
+          "causal_domain": "Abiotic & Biotic Environments",
+          "description": "Predators exert selective pressure on snails.",
+          "color": "#2E7D32"
+        },
+        {
+          "id": "n3",
+          "label": "Toxin Synthesis",
+          "causal_domain": "Body",
+          "description": "Specialized biochemical pathways for toxin production.",
+          "color": "#FF7043"
+        }
+      ],
+      "links": [
+        {
+          "source": "n1",
+          "target": "n2",
+          "relationship": "influences features of",
+          "description": "Toxin production reduces predation pressure."
+        },
+        {
+          "source": "n2",
+          "target": "n3",
+          "relationship": "creates selection of",
+          "description": "Reduced predation selects for enhanced toxin synthesis."
+        }
+      ]
+    }
+  },
+  {
+    "case_id": "oak_nuts_gain",
+    "title": "Emergence of Nuts in Oak Populations",
+    "species": "Oak",
+    "trait": "Nuts",
+    "type": "Within",
+    "gain_loss": "Gain",
+    "evolutionary_explanation": "Environmental factors triggered plastic responses in some oaks, producing nut-like structures. These individuals could pass on epigenetic markers that facilitate nut production in offspring, creating a mixed population.",
+    "verification": "Supported",
+    "validity_analysis": "Variation in nut production could arise via plasticity and epigenetics, supported by plant reproductive studies.",
+    "sources": ["Epigenetic inheritance in plants"],
+    "relevant_schemas": [
+      {
+        "schema_id": "phenotypic_plasticity",
+        "description": "Plastic responses to environmental cues initiated nut production."
+      },
+      {
+        "schema_id": "epigenetic_inheritance",
+        "description": "Epigenetic markers maintained nut-producing phenotypes."
+      }
+    ],
+    "causal_map": {
+      "nodes": [
+        {
+          "id": "n1",
+          "label": "Environmental Cues",
+          "causal_domain": "Abiotic & Biotic Environments",
+          "description": "Nutrient or climate conditions affecting oak reproduction.",
+          "color": "#2E7D32"
+        },
+        {
+          "id": "n2",
+          "label": "Nut Development",
+          "causal_domain": "Body",
+          "description": "Plastic production of acorns in some individuals.",
+          "color": "#FF7043"
+        },
+        {
+          "id": "n3",
+          "label": "Epigenetic Markers",
+          "causal_domain": "Genes",
+          "description": "Epigenetic changes supporting nut production.",
+          "color": "#FFCA28"
+        }
+      ],
+      "links": [
+        {
+          "source": "n1",
+          "target": "n2",
+          "relationship": "enables development of",
+          "description": "Environmental cues trigger plastic nut development."
+        },
+        {
+          "source": "n2",
+          "target": "n3",
+          "relationship": "influences expression of",
+          "description": "Nut development promotes epigenetic changes for persistence."
+        }
+      ]
+    }
+  },
+  {
+    "case_id": "fly_wings_gain",
+    "title": "Evolution of Wings in Flies",
+    "species": "Fly",
+    "trait": "Wings",
+    "type": "Between",
+    "gain_loss": "Gain",
+    "evolutionary_explanation": "Proto-wing structures developed as plastic responses to environmental stimuli. Flies exploiting aerial niches experienced selection favoring genetic variants that produced functional wings.",
+    "verification": "Supported",
+    "validity_analysis": "Wing evolution in insects via niche selection and plasticity is widely accepted, supported by fossil records.",
+    "sources": ["Evolution of insect wings"],
+    "relevant_schemas": [
+      {
+        "schema_id": "niche_selection",
+        "description": "Aerial niches favored winged flies."
+      },
+      {
+        "schema_id": "developmental_plasticity",
+        "description": "Plastic proto-wings initiated wing development."
+      }
+    ],
+    "causal_map": {
+      "nodes": [
+        {
+          "id": "n1",
+          "label": "Dispersal Behavior",
+          "causal_domain": "Behavior",
+          "description": "Flies attempt to exploit aerial environments.",
+          "color": "#2196F3"
+        },
+        {
+          "id": "n2",
+          "label": "Aerial Environment",
+          "causal_domain": "Abiotic & Biotic Environments",
+          "description": "Open habitats favor flight for dispersal.",
+          "color": "#2E7D32"
+        },
+        {
+          "id": "n3",
+          "label": "Wing Morphology",
+          "causal_domain": "Body",
+          "description": "Functional wings for flight.",
+          "color": "#FF7043"
+        }
+      ],
+      "links": [
+        {
+          "source": "n1",
+          "target": "n2",
+          "relationship": "influences experience of",
+          "description": "Dispersal behavior exposes flies to aerial conditions."
+        },
+        {
+          "source": "n2",
+          "target": "n3",
+          "relationship": "creates selection of",
+          "description": "Aerial environment selects for wing development."
+        }
+      ]
+    }
+  },
+  {
+    "case_id": "grape_tendrils_gain",
+    "title": "Evolution of Tendrils in Grapes",
+    "species": "Grape",
+    "trait": "Tendrils",
+    "type": "Between",
+    "gain_loss": "Gain",
+    "evolutionary_explanation": "Plastic growth responses to contact with supports allowed ancestral grapes to access more sunlight. This niche construction created selection pressures favoring genetic variants that produced specialized climbing structures.",
+    "verification": "Supported",
+    "validity_analysis": "Grape tendrils are modified inflorescences, evolving for support, consistent with plasticity and selection in climbing plants.",
+    "sources": ["Evolution of tendrils in plants"],
+    "relevant_schemas": [
+      {
+        "schema_id": "niche_construction",
+        "description": "Tendrils constructed a niche with better sunlight access."
+      },
+      {
+        "schema_id": "developmental_plasticity",
+        "description": "Plastic growth responses initiated tendril development."
+      }
+    ],
+    "causal_map": {
+      "nodes": [
+        {
+          "id": "n1",
+          "label": "Climbing Response",
+          "causal_domain": "Behavior",
+          "description": "Grapes exhibit plastic growth toward supports.",
+          "color": "#2196F3"
+        },
+        {
+          "id": "n2",
+          "label": "Sunlit Environment",
+          "causal_domain": "Abiotic & Biotic Environments",
+          "description": "Elevated positions provide better sunlight access.",
+          "color": "#2E7D32"
+        },
+        {
+          "id": "n3",
+          "label": "Tendril Development",
+          "causal_domain": "Body",
+          "description": "Specialized structures for climbing and support.",
+          "color": "#FF7043"
+        }
+      ],
+      "links": [
+        {
+          "source": "n1",
+          "target": "n2",
+          "relationship": "influences features of",
+          "description": "Climbing constructs a niche with improved sunlight access."
+        },
+        {
+          "source": "n2",
+          "target": "n3",
+          "relationship": "creates selection of",
+          "description": "Sunlit niche selects for effective tendrils."
+        }
+      ]
+    }
+  }
+]
